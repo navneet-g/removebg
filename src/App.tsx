@@ -194,13 +194,7 @@ function App() {
     })
   }
 
-  const rotateImageFine = (direction: 'left' | 'right') => {
-    setRotation(prev => {
-      const increment = 1 // 1 degree increments
-      const newRotation = direction === 'left' ? prev - increment : prev + increment
-      return newRotation
-    })
-  }
+
 
   const setRotationExact = (degrees: number) => {
     setRotation(degrees)
@@ -509,12 +503,15 @@ function App() {
                 onMouseLeave={handleMouseUp}
                 onMouseUp={handleMouseUp}
               >
-                <canvas
-                  ref={canvasRef}
-                  className="editor-canvas"
-                  style={{ display: 'none' }}
-                />
-                <div className="image-preview-container">
+                <div className="editor-preview-container">
+                  <button 
+                    className="rotate-btn rotate-left"
+                    onClick={() => rotateImage('left')}
+                    title="Rotate Left 90°"
+                  >
+                    ↶
+                  </button>
+                  
                   <img 
                     src={editedImage || URL.createObjectURL(selectedImage)} 
                     alt="Preview" 
@@ -525,6 +522,15 @@ function App() {
                     }}
                     onMouseDown={(e) => handleMouseDown(e, 'move')}
                   />
+                  
+                  <button 
+                    className="rotate-btn rotate-right"
+                    onClick={() => rotateImage('right')}
+                    title="Rotate Right 90°"
+                  >
+                    ↷
+                  </button>
+                  
                   <div 
                     className="crop-overlay"
                     style={{
@@ -549,62 +555,7 @@ function App() {
               
               <div className="editor-controls">
                 <div className="control-group">
-                  <h4>Rotation</h4>
-                  <div className="rotation-controls">
-                    <button 
-                      onClick={() => rotateImage('left')} 
-                      className="control-btn rotation-btn"
-                    >
-                      ↶ Rotate Left 90°
-                    </button>
-                    <button 
-                      onClick={() => rotateImage('right')} 
-                      className="control-btn rotation-btn"
-                    >
-                      ↷ Rotate Right 90°
-                    </button>
-                  </div>
-                  
-                  <div className="fine-rotation-controls">
-                    <h5>Fine Tune</h5>
-                    <div className="fine-rotation-buttons">
-                      <button 
-                        onClick={() => rotateImageFine('left')} 
-                        className="control-btn fine-rotation-btn"
-                      >
-                        ↶ -1°
-                      </button>
-                      <button 
-                        onClick={() => rotateImageFine('right')} 
-                        className="control-btn fine-rotation-btn"
-                      >
-                        ↷ +1°
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div className="rotation-input">
-                    <label>
-                      Exact Rotation:
-                      <div className="rotation-input-group">
-                        <input
-                          type="number"
-                          min="-360"
-                          max="360"
-                          step="1"
-                          value={rotation}
-                          onChange={(e) => setRotationExact(parseFloat(e.target.value) || 0)}
-                          className="rotation-number-input"
-                        />
-                        <span className="degree-symbol">°</span>
-                      </div>
-                    </label>
-                  </div>
-                  
-                  <div className="rotation-display">
-                    Current: {rotation}°
-                  </div>
-                  
+                  <h4>Current Rotation: {rotation}°</h4>
                   {rotation !== 0 && (
                     <button 
                       onClick={() => setRotationExact(0)} 

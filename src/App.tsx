@@ -441,7 +441,7 @@ function App() {
     <div className="app">
       <header className="app-header">
         <h1>Passport Photo Creator</h1>
-        <p>Create 2x2 passport photos meeting USA & India specifications</p>
+        <p>Create 2x2 passport photos</p>
       </header>
 
       <main className="app-main">
@@ -467,35 +467,7 @@ function App() {
               style={{ display: 'none' }}
             />
             
-            <div className="specifications-info">
-              <h3>Passport Photo Requirements</h3>
-              <div className="specs-grid">
-                <div className="spec-item">
-                  <strong>Size:</strong> 2" × 2" (51mm × 51mm)
-                </div>
-                <div className="spec-item">
-                  <strong>Resolution:</strong> 600 × 600 pixels (300 DPI)
-                </div>
-                <div className="spec-item">
-                  <strong>Background:</strong> Pure white
-                </div>
-                <div className="spec-item">
-                  <strong>Head Size:</strong> 0.8" to 1.3" from chin to crown
-                </div>
-                <div className="spec-item">
-                  <strong>Frame Utilization:</strong> Subject fills entire frame
-                </div>
-                <div className="spec-item">
-                  <strong>White Space:</strong> Minimal to none
-                </div>
-                <div className="spec-item">
-                  <strong>Format:</strong> PNG with high quality
-                </div>
-                <div className="spec-item">
-                  <strong>Positioning:</strong> Centered with maximum coverage
-                </div>
-              </div>
-            </div>
+
           </div>
         )}
 
@@ -662,14 +634,7 @@ function App() {
           </div>
         )}
 
-        {isProcessing && (
-          <div className="processing-section">
-            <div className="loading-spinner"></div>
-            <p>Removing background and creating passport photo...</p>
-            <p className="processing-note">This may take a few moments</p>
-            <p className="processing-note">Ensuring compliance with USA & India passport standards</p>
-          </div>
-        )}
+
 
         {error && (
           <div className="error-section">
@@ -756,7 +721,7 @@ function App() {
       </main>
 
       <footer className="app-footer">
-        <p>Powered by @imgly/background-removal • Compliant with USA & India passport standards</p>
+        <p>Powered by @imgly/background-removal</p>
       </footer>
     </div>
   )

@@ -618,6 +618,16 @@ body {
   cursor: e-resize;
 }
 
+.crop-handle-move {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  cursor: move;
+  pointer-events: all;
+}
+
 .editor-controls {
   display: flex;
   flex-direction: column;

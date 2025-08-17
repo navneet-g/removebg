@@ -54,6 +54,9 @@ function App() {
   const [crop, setCrop] = useState({ x: 0, y: 0, width: 100, height: 100 })
   const fileInputRef = useRef<HTMLInputElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragHandle, setDragHandle] = useState<string | null>(null)
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -336,6 +339,86 @@ function App() {
     }
   }
 
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>, handle: string) => {
+    e.preventDefault()
+    setIsDragging(true)
+    setDragHandle(handle)
+    setDragStart({ x: e.clientX, y: e.clientY })
+  }
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDragging || !dragHandle) return
+
+    const deltaX = e.clientX - dragStart.x
+    const deltaY = e.clientY - dragStart.y
+    
+    // Get image container dimensions
+    const container = e.currentTarget.parentElement
+    if (!container) return
+    
+    const rect = container.getBoundingClientRect()
+    const containerWidth = rect.width
+    const containerHeight = rect.height
+    
+    // Calculate percentage changes
+    const deltaXPercent = (deltaX / containerWidth) * 100
+    const deltaYPercent = (deltaY / containerHeight) * 100
+    
+    setCrop(prev => {
+      const newCrop = { ...prev }
+      
+      switch (dragHandle) {
+        case 'top-left':
+          newCrop.x = Math.max(0, Math.min(prev.x + deltaXPercent, prev.x + prev.width - 20))
+          newCrop.y = Math.max(0, Math.min(prev.y + deltaYPercent, prev.y + prev.height - 20))
+          newCrop.width = Math.max(20, prev.width - deltaXPercent)
+          newCrop.height = Math.max(20, prev.height - deltaYPercent)
+          break
+        case 'top-right':
+          newCrop.y = Math.max(0, Math.min(prev.y + deltaYPercent, prev.y + prev.height - 20))
+          newCrop.width = Math.max(20, prev.width + deltaXPercent)
+          newCrop.height = Math.max(20, prev.height - deltaYPercent)
+          break
+        case 'bottom-left':
+          newCrop.x = Math.max(0, Math.min(prev.x + deltaXPercent, prev.x + prev.width - 20))
+          newCrop.width = Math.max(20, prev.width - deltaXPercent)
+          newCrop.height = Math.max(20, prev.height + deltaYPercent)
+          break
+        case 'bottom-right':
+          newCrop.width = Math.max(20, prev.width + deltaXPercent)
+          newCrop.height = Math.max(20, prev.height + deltaYPercent)
+          break
+        case 'top':
+          newCrop.y = Math.max(0, Math.min(prev.y + deltaYPercent, prev.y + prev.height - 20))
+          newCrop.height = Math.max(20, prev.height - deltaYPercent)
+          break
+        case 'bottom':
+          newCrop.height = Math.max(20, prev.height + deltaYPercent)
+          break
+        case 'left':
+          newCrop.x = Math.max(0, Math.min(prev.x + deltaXPercent, prev.x + prev.width - 20))
+          newCrop.width = Math.max(20, prev.width - deltaXPercent)
+          break
+        case 'right':
+          newCrop.width = Math.max(20, prev.width + deltaXPercent)
+          break
+        case 'move':
+          newCrop.x = Math.max(0, Math.min(100 - prev.width, prev.x + deltaXPercent))
+          newCrop.y = Math.max(0, Math.min(100 - prev.height, prev.y + deltaYPercent))
+          break
+      }
+      
+      return newCrop
+    })
+    
+    setDragStart({ x: e.clientX, y: e.clientY })
+  }
+
+  const handleMouseUp = () => {
+    setIsDragging(false)
+    setDragHandle(null)
+  }
+
   return (
     <div className="app">
       <header className="app-header">
@@ -429,10 +512,15 @@ function App() {
                       height: `${crop.height}%`
                     }}
                   >
-                    <div className="crop-handle crop-handle-top-left"></div>
-                    <div className="crop-handle crop-handle-top-right"></div>
-                    <div className="crop-handle crop-handle-bottom-left"></div>
-                    <div className="crop-handle crop-handle-bottom-right"></div>
+                    <div className="crop-handle crop-handle-top-left" onMouseDown={(e) => handleMouseDown(e, 'top-left')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
+                    <div className="crop-handle crop-handle-top-right" onMouseDown={(e) => handleMouseDown(e, 'top-right')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
+                    <div className="crop-handle crop-handle-bottom-left" onMouseDown={(e) => handleMouseDown(e, 'bottom-left')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
+                    <div className="crop-handle crop-handle-bottom-right" onMouseDown={(e) => handleMouseDown(e, 'bottom-right')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
+                    <div className="crop-handle crop-handle-top" onMouseDown={(e) => handleMouseDown(e, 'top')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
+                    <div className="crop-handle crop-handle-bottom" onMouseDown={(e) => handleMouseDown(e, 'bottom')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
+                    <div className="crop-handle crop-handle-left" onMouseDown={(e) => handleMouseDown(e, 'left')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
+                    <div className="crop-handle crop-handle-right" onMouseDown={(e) => handleMouseDown(e, 'right')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
+                    <div className="crop-handle crop-handle-move" onMouseDown={(e) => handleMouseDown(e, 'move')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
                   </div>
                 </div>
               </div>

@@ -45,11 +45,10 @@ body {
 
 /* Main content */
 .app-main {
-  flex: 1;
-  padding: 2rem 1rem;
-  max-width: 1200px;
+  padding: 2rem;
+  max-width: 1400px;
   margin: 0 auto;
-  width: 100%;
+  width: 95%;
 }
 
 /* Upload section */
@@ -484,8 +483,9 @@ body {
   border-radius: 20px;
   padding: 1rem;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
+  width: 95%;
 }
 
 .editor-section h3 {
@@ -509,6 +509,7 @@ body {
   gap: 1rem;
   align-items: flex-start;
   margin-bottom: 1rem;
+  width: 100%;
 }
 
 .image-editor {

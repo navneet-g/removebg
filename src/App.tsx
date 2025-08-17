@@ -1,5 +1,30 @@
 import { useState, useRef, useEffect } from 'react'
 import { removeBackground } from '@imgly/background-removal'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Navigation, Pagination } from 'swiper/modules'
+import 'swiper/swiper-bundle.css'
+import { 
+  Button, 
+  Typography, 
+  Box, 
+  Paper, 
+  Alert,
+  Container,
+  AppBar,
+  Toolbar,
+  Card,
+  CardContent,
+  CardActions,
+  IconButton
+} from '@mui/material'
+import { 
+  PhotoCamera, 
+  Download, 
+  Refresh, 
+  Add,
+  Clear,
+  Image
+} from '@mui/icons-material'
 import './App.css'
 
 // Passport photo specifications
@@ -72,8 +97,7 @@ function App() {
       backgroundColor: string
     }
   }>>([])
-  const [currentSlide, setCurrentSlide] = useState(0)
-  const [itemsPerView, setItemsPerView] = useState(4)
+
 
   // Handle browser navigation and URL management
   useEffect(() => {
@@ -400,7 +424,7 @@ function App() {
       ctx.fillRect(0, 0, pageWidth, pageHeight)
       
       // Load the passport photo
-      const img = new Image()
+      const img = new window.Image()
       img.onload = () => {
         try {
           // Calculate photo dimensions for the grid
@@ -507,7 +531,7 @@ function App() {
           throw new Error('Failed to get canvas context')
         }
 
-        const img = new Image()
+        const img = new window.Image()
         img.onload = () => {
           // Set canvas size
           canvas.width = img.width
@@ -584,7 +608,7 @@ function App() {
       }
       
       // Load the processed image
-      const img = new Image()
+      const img = new window.Image()
       img.onload = () => {
         try {
           // Create passport photo with exact specifications
@@ -761,75 +785,107 @@ function App() {
     }
   }
 
-  // Carousel navigation functions
-  const nextSlide = () => {
-    setCurrentSlide(prev => {
-      const maxSlide = Math.max(0, photoHistory.length - itemsPerView)
-      return prev >= maxSlide ? 0 : prev + 1
-    })
-  }
 
-  const prevSlide = () => {
-    setCurrentSlide(prev => {
-      const maxSlide = Math.max(0, photoHistory.length - itemsPerView)
-      return prev <= 0 ? maxSlide : prev - 1
-    })
-  }
-
-  const goToSlide = (index: number) => {
-    setCurrentSlide(index)
-  }
-
-  // Calculate visible items for carousel
-  const visibleItems = photoHistory.slice(currentSlide, currentSlide + itemsPerView)
-
-  // Handle responsive carousel sizing
-  useEffect(() => {
-    const updateItemsPerView = () => {
-      if (window.innerWidth < 640) {
-        setItemsPerView(2) // Mobile: 2 items per view
-      } else if (window.innerWidth < 1024) {
-        setItemsPerView(3) // Tablet: 3 items per view
-      } else {
-        setItemsPerView(4) // Desktop: 4 items per view
-      }
-    }
-
-    updateItemsPerView()
-    window.addEventListener('resize', updateItemsPerView)
-    
-    return () => {
-      window.removeEventListener('resize', updateItemsPerView)
-    }
-  }, [])
 
   return (
-    <div className="app">
-      <header className="app-header">
-        <h1>Passport Photo Creator</h1>
-        <p>Create 2x2 passport photos</p>
-      </header>
+    <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%)' }}>
+      {/* App Bar */}
+      <AppBar 
+        position="static" 
+        sx={{ 
+          background: 'rgba(255, 255, 255, 0.08)',
+          backdropFilter: 'blur(20px)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
+        }}
+      >
+        <Toolbar sx={{ justifyContent: 'center', py: 1 }}>
+          <Typography variant="h4" component="h1" sx={{ fontWeight: 700, color: 'white' }}>
+            Passport Photo Creator
+          </Typography>
+        </Toolbar>
+        <Toolbar sx={{ justifyContent: 'center', pt: 0, pb: 1 }}>
+          <Typography variant="h6" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+            Create 2x2 passport photos
+          </Typography>
+        </Toolbar>
+      </AppBar>
 
-      <main className="app-main">
+      <Container maxWidth="md" sx={{ py: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        {/* Privacy Notice */}
+        <Alert 
+          severity="info" 
+          sx={{ 
+            mb: 2, 
+            width: '100%',
+            maxWidth: 600,
+            background: 'rgba(34, 197, 94, 0.1)',
+            border: '1px solid rgba(34, 197, 94, 0.3)',
+            color: 'rgba(255, 255, 255, 0.9)',
+            '& .MuiAlert-icon': { color: 'rgba(34, 197, 94, 0.8)' }
+          }}
+        >
+          <strong>Privacy First:</strong> All photos are processed locally in your browser and stored only on your device. Nothing is uploaded to our servers.
+        </Alert>
+        
         {!selectedImage && !processedImage && (
-          <div className="upload-section">
-            <div 
-              className={`upload-area ${isDragOver ? 'drag-over' : ''}`}
+          <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Paper
+              elevation={3}
+              sx={{
+                p: 3,
+                textAlign: 'center',
+                width: '100%',
+                maxWidth: 600,
+                background: 'rgba(255, 255, 255, 0.08)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: 3,
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)'
+                },
+                ...(isDragOver && {
+                  border: '2px solid rgba(99, 102, 241, 0.8)',
+                  background: 'rgba(99, 102, 241, 0.1)'
+                })
+              }}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
             >
-              <div className="upload-icon">📷</div>
-              <button 
-                className="upload-button"
+              <PhotoCamera sx={{ fontSize: 60, mb: 2, color: 'rgba(255, 255, 255, 0.8)' }} />
+              <Typography variant="h6" sx={{ mb: 1.5, color: 'white' }}>
+                Ready to create your passport photo?
+              </Typography>
+              <Button
+                variant="contained"
+                size="medium"
+                startIcon={<PhotoCamera />}
                 onClick={() => fileInputRef.current?.click()}
-                type="button"
+                sx={{
+                  background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                  mb: 1.5,
+                  px: 4,
+                  py: 1.5,
+                  fontSize: '1rem',
+                  fontWeight: 600,
+                  borderRadius: 2
+                }}
               >
                 Select a Photo
-              </button>
-              <p className="upload-hint">or drag and drop</p>
-              {isDragOver && <p className="drag-text">Drop your image here!</p>}
-            </div>
+              </Button>
+              <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                or drag and drop your image here
+              </Typography>
+              {isDragOver && (
+                <Typography variant="body1" sx={{ color: '#6366f1', fontWeight: 600, mt: 1 }}>
+                  Drop your image here!
+                </Typography>
+              )}
+            </Paper>
             <input
               ref={fileInputRef}
               type="file"
@@ -840,98 +896,150 @@ function App() {
             
             {/* Photo History Section */}
             {photoHistory.length > 0 && (
-              <div className="photo-history-section">
-                <div className="history-header">
-                  <h3>Recent Photos</h3>
-                  <button 
+              <Box sx={{ mt: 4, width: '100%', maxWidth: 800 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                  <Typography variant="h5" sx={{ color: '#00d4aa', fontWeight: 600 }}>
+                    Recent Photos
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    startIcon={<Clear />}
                     onClick={clearPhotoHistory}
-                    className="clear-history-btn"
-                    title="Clear all history"
+                    sx={{
+                      borderRadius: 2,
+                      px: 3,
+                      py: 1
+                    }}
                   >
                     Clear All
-                  </button>
-                </div>
-                
-                {photoHistory.length > itemsPerView && (
-                  <div className="carousel-controls">
-                    <button 
-                      onClick={prevSlide}
-                      className="carousel-btn carousel-prev"
-                      title="Previous photos"
-                    >
-                      ‹
-                    </button>
-                    <div className="carousel-dots">
-                      {Array.from({ length: Math.ceil(photoHistory.length / itemsPerView) }).map((_, index) => (
-                        <button
-                          key={index}
-                          onClick={() => goToSlide(index * itemsPerView)}
-                          className={`carousel-dot ${currentSlide === index * itemsPerView ? 'active' : ''}`}
-                          title={`Go to page ${index + 1}`}
-                        />
-                      ))}
-                    </div>
-                    <button 
-                      onClick={nextSlide}
-                      className="carousel-btn carousel-next"
-                      title="Next photos"
-                    >
-                      ›
-                    </button>
-                  </div>
-                )}
-                
-                <div className="history-grid">
-                  {visibleItems.map((photo) => (
-                    <div key={photo.id} className="history-item">
-                      <div className="history-preview">
-                        <div className="history-images">
-                          <div className="history-original">
-                            <span className="image-label">Original</span>
-                            <img 
-                              src={photo.originalImage} 
-                              alt={`Original ${photo.name}`}
-                              className="history-thumbnail"
-                            />
-                          </div>
-                          <div className="history-processed">
-                            <span className="image-label">Processed</span>
-                            <img 
-                              src={photo.processedImage} 
-                              alt={`Processed ${photo.name}`}
-                              className="history-thumbnail"
-                            />
-                          </div>
-                        </div>
-                        <div className="history-overlay">
-                          <button
+                  </Button>
+                </Box>
+
+                <Swiper
+                  modules={[Navigation, Pagination]}
+                  spaceBetween={20}
+                  slidesPerView={1}
+                  navigation={true}
+                  pagination={{ clickable: true }}
+                  breakpoints={{
+                    640: { slidesPerView: 2 },
+                    768: { slidesPerView: 3 },
+                    1024: { slidesPerView: 4 },
+                  }}
+                  style={{
+                    padding: '0 20px'
+                  }}
+                >
+                  {photoHistory.map((photo) => (
+                    <SwiperSlide key={photo.id}>
+                      <Card 
+                        sx={{ 
+                          background: 'rgba(255, 255, 255, 0.08)',
+                          backdropFilter: 'blur(20px)',
+                          border: '1px solid rgba(255, 255, 255, 0.2)',
+                          borderRadius: 2,
+                          height: '100%',
+                          display: 'flex',
+                          flexDirection: 'column'
+                        }}
+                      >
+                        <CardContent sx={{ p: 2, flexGrow: 1 }}>
+                          <Box sx={{ display: 'flex', gap: 2 }}>
+                            <Box sx={{ flex: 1 }}>
+                              <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.7)', display: 'block', mb: 1, textAlign: 'center' }}>
+                                Original
+                              </Typography>
+                              <Box
+                                component="img"
+                                src={photo.originalImage}
+                                alt={`Original ${photo.name}`}
+                                sx={{
+                                  width: '100%',
+                                  height: 80,
+                                  objectFit: 'cover',
+                                  borderRadius: 1,
+                                  border: '1px solid rgba(255, 255, 255, 0.2)'
+                                }}
+                              />
+                            </Box>
+                            <Box sx={{ flex: 1, position: 'relative' }}>
+                              <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.7)', display: 'block', mb: 1, textAlign: 'center' }}>
+                                Processed
+                              </Typography>
+                              <Box
+                                component="img"
+                                src={photo.processedImage}
+                                alt={`Processed ${photo.name}`}
+                                sx={{
+                                  width: '100%',
+                                  height: 80,
+                                  objectFit: 'cover',
+                                  borderRadius: 1,
+                                  border: '1px solid rgba(255, 255, 255, 0.2)'
+                                }}
+                              />
+                              <Box
+                                sx={{
+                                  position: 'absolute',
+                                  top: 4,
+                                  left: '50%',
+                                  transform: 'translateX(-50%)',
+                                  background: 'rgba(0, 0, 0, 0.7)',
+                                  color: 'white',
+                                  px: 1,
+                                  py: 0.5,
+                                  borderRadius: 1,
+                                  fontSize: '0.7rem',
+                                  fontWeight: 500
+                                }}
+                              >
+                                Processed
+                              </Box>
+                            </Box>
+                          </Box>
+                          <Typography variant="body2" sx={{ color: 'white', mt: 2, fontWeight: 500, textAlign: 'center' }}>
+                            {photo.name}
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.6)', display: 'block', textAlign: 'center' }}>
+                            {new Date(photo.timestamp).toLocaleDateString()}
+                          </Typography>
+                        </CardContent>
+                        <CardActions sx={{ p: 2, pt: 0, justifyContent: 'center' }}>
+                          <Button
+                            size="small"
+                            variant="contained"
+                            startIcon={<Image />}
                             onClick={() => loadFromHistory(photo)}
-                            className="load-history-btn"
-                            title="Load this photo"
+                            sx={{
+                              background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                              mr: 1,
+                              borderRadius: 2
+                            }}
                           >
                             Load
-                          </button>
-                          <button
+                          </Button>
+                          <IconButton
+                            size="small"
                             onClick={() => removeFromHistory(photo.id)}
-                            className="remove-history-btn"
-                            title="Remove from history"
+                            sx={{ 
+                              color: 'rgba(255, 255, 255, 0.6)',
+                              '&:hover': {
+                                color: 'white',
+                                background: 'rgba(255, 255, 255, 0.1)'
+                              }
+                            }}
                           >
-                            ×
-                          </button>
-                        </div>
-                      </div>
-                      <div className="history-info">
-                        <span className="history-name">{photo.name}</span>
-                        <span className="history-date">
-                          {new Date(photo.timestamp).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </div>
+                            <Clear />
+                          </IconButton>
+                        </CardActions>
+                      </Card>
+                    </SwiperSlide>
                   ))}
-                </div>
-              </div>
+                </Swiper>
+              </Box>
             )}
-          </div>
+          </Box>
         )}
 
         {selectedImage && showEditor && (
@@ -1207,31 +1315,69 @@ function App() {
 
 
             
-            <div className="action-buttons">
-                              <button onClick={downloadImage} className="download-btn">
-                  Download Photo
-                </button>
-              <button 
-                onClick={handleGeneratePrintable} 
-                disabled={isGeneratingPrintable}
-                className="printable-btn"
-              >
-                {isGeneratingPrintable ? (
-                  <>
-                    <div className="button-spinner"></div>
-                    Generating Printable Page...
-                  </>
-                ) : (
-                  'Generate Printable Page'
-                )}
-              </button>
-              <button onClick={processImage} className="regenerate-btn">
-                                  Regenerate
-              </button>
-              <button onClick={resetApp} className="reset-btn">
-                                  Create Another
-              </button>
-            </div>
+                    <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mt: 3 }}>
+          <Button
+            variant="contained"
+            startIcon={<Download />}
+            onClick={downloadImage}
+            sx={{
+              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              px: 3,
+              py: 1.5,
+              fontSize: '1rem',
+              fontWeight: 600
+            }}
+          >
+            Download Photo
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleGeneratePrintable}
+            disabled={isGeneratingPrintable}
+            sx={{
+              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+              px: 3,
+              py: 1.5,
+              fontSize: '1rem',
+              fontWeight: 600
+            }}
+          >
+            {isGeneratingPrintable ? 'Generating...' : 'Generate Printable Page'}
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<Refresh />}
+            onClick={processImage}
+            sx={{
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+              px: 3,
+              py: 1.5,
+              fontSize: '1rem',
+              fontWeight: 600
+            }}
+          >
+            Regenerate
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={<Add />}
+            onClick={resetApp}
+            sx={{
+              borderColor: 'rgba(255, 255, 255, 0.3)',
+              color: 'rgba(255, 255, 255, 0.9)',
+              px: 3,
+              py: 1.5,
+              fontSize: '1rem',
+              fontWeight: 600,
+              '&:hover': {
+                borderColor: 'rgba(255, 255, 255, 0.5)',
+                background: 'rgba(255, 255, 255, 0.1)'
+              }
+            }}
+          >
+            Create Another
+          </Button>
+        </Box>
           </div>
         )}
 
@@ -1259,10 +1405,8 @@ function App() {
             </div>
           </div>
         )}
-      </main>
-
-
-    </div>
+      </Container>
+    </Box>
   )
 }
 

@@ -161,37 +161,7 @@ function App() {
     }
   }, [isDragging, dragHandle, dragStart])
 
-  // Detect touch device capabilities and apply appropriate styles
-  useEffect(() => {
-    const detectTouchDevice = () => {
-      const hasTouchSupport = 'ontouchstart' in window || navigator.maxTouchPoints > 0
-      const hasCoarsePointer = window.matchMedia('(pointer: coarse)').matches
-      const hasNoHover = window.matchMedia('(hover: none)').matches
-      
-      // Apply touch-device class if device supports touch
-      if (hasTouchSupport || hasCoarsePointer || hasNoHover) {
-        document.body.classList.add('touch-device')
-        console.log('Touch device detected - applying touch-friendly styles')
-      } else {
-        document.body.classList.remove('touch-device')
-        console.log('Desktop device detected - using standard styles')
-      }
-    }
 
-    // Detect on mount
-    detectTouchDevice()
-
-    // Re-detect on orientation change (mobile devices)
-    window.addEventListener('orientationchange', detectTouchDevice)
-    
-    // Re-detect on resize (some devices change capabilities)
-    window.addEventListener('resize', detectTouchDevice)
-
-    return () => {
-      window.removeEventListener('orientationchange', detectTouchDevice)
-      window.removeEventListener('resize', detectTouchDevice)
-    }
-  }, [])
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]

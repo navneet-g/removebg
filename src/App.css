@@ -21,12 +21,7 @@ body {
   flex-direction: column;
 }
 
-/* Touch device specific improvements */
-.touch-device .app {
-  /* Optimize for touch interactions */
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-}
+
 
 /* Header styles */
 .app-header {
@@ -494,66 +489,7 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
-/* Touch device optimizations - will be dynamically applied via JavaScript */
-.touch-device .crop-handle {
-  /* Larger touch targets for mobile */
-  width: 40px;
-  height: 40px;
-  min-width: 40px;
-  min-height: 40px;
-}
 
-.touch-device .crop-handle-top-left {
-  top: -20px;
-  left: -20px;
-}
-
-.touch-device .crop-handle-top-right {
-  top: -20px;
-  right: -20px;
-}
-
-.touch-device .crop-handle-bottom-left {
-  bottom: -20px;
-  left: -20px;
-}
-
-.touch-device .crop-handle-bottom-right {
-  bottom: -20px;
-  right: -20px;
-}
-
-.touch-device .crop-handle-top {
-  top: -20px;
-}
-
-.touch-device .crop-handle-bottom {
-  bottom: -20px;
-}
-
-.touch-device .crop-handle-left {
-  left: -20px;
-}
-
-.touch-device .crop-handle-right {
-  right: -20px;
-}
-
-/* Additional touch device optimizations */
-.touch-device .editor-section {
-  /* Better touch scrolling */
-  -webkit-overflow-scrolling: touch;
-}
-
-.touch-device .image-preview-container {
-  /* Prevent zoom on double-tap */
-  touch-action: pan-x pan-y;
-}
-
-.touch-device .crop-overlay {
-  /* Better touch interaction */
-  touch-action: none;
-}
 
 .crop-handle:active {
   transform: scale(1.05);

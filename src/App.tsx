@@ -815,13 +815,18 @@ function App() {
           <div className="upload-section">
             <div 
               className={`upload-area ${isDragOver ? 'drag-over' : ''}`}
-              onClick={() => fileInputRef.current?.click()}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
             >
               <div className="upload-icon">📷</div>
-              <p>Click to select an image</p>
+              <button 
+                className="upload-button"
+                onClick={() => fileInputRef.current?.click()}
+                type="button"
+              >
+                Select a Photo
+              </button>
               <p className="upload-hint">or drag and drop</p>
               {isDragOver && <p className="drag-text">Drop your image here!</p>}
             </div>
@@ -1203,9 +1208,9 @@ function App() {
 
             
             <div className="action-buttons">
-              <button onClick={downloadImage} className="download-btn">
-                Download Passport Photo
-              </button>
+                              <button onClick={downloadImage} className="download-btn">
+                  Download Photo
+                </button>
               <button 
                 onClick={handleGeneratePrintable} 
                 disabled={isGeneratingPrintable}
@@ -1217,14 +1222,14 @@ function App() {
                     Generating Printable Page...
                   </>
                 ) : (
-                  'Generate 4x6 Printable Page'
+                  'Generate Printable Page'
                 )}
               </button>
               <button onClick={processImage} className="regenerate-btn">
-                Regenerate Photo
+                                  Regenerate
               </button>
               <button onClick={resetApp} className="reset-btn">
-                Create Another Photo
+                                  Create Another
               </button>
             </div>
           </div>

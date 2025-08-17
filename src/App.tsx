@@ -29,10 +29,11 @@ const PASSPORT_SPECS = {
     pixels: 375 // 1.25 inches * 300 DPI
   },
   // Frame utilization - head should fill most of the available space
+  // but NEVER cut off any part of the subject
   frameUtilization: {
-    minHeadHeight: 0.6, // Head should fill at least 60% of frame height
-    targetHeadHeight: 0.75, // Target: head fills 75% of frame height
-    maxHeadHeight: 0.85 // Head should not fill more than 85% of frame height
+    minHeadHeight: 0.5, // Head should fill at least 50% of frame height (more conservative)
+    targetHeadHeight: 0.65, // Target: head fills 65% of frame height (safer)
+    maxHeadHeight: 0.75 // Head should not fill more than 75% of frame height (prevents cutting)
   }
 }
 
@@ -268,24 +269,34 @@ function App() {
   }
 
   const calculateOptimalPosition = (img: HTMLImageElement, canvasSize: number) => {
-    // For passport photos, we want to eliminate ALL white space
-    // Make the subject fill the entire frame with minimal margins
+    // For passport photos, we want to ensure the subject is fully visible
+    // while still maximizing frame utilization
     
-    // Calculate scale to fill the entire frame
-    // Use the larger dimension to ensure complete coverage
+    // Calculate scale to fit the image within the frame
+    // Use the smaller dimension to ensure the entire image fits
     const scaleX = canvasSize / img.width
     const scaleY = canvasSize / img.height
     
-    // Use the larger scale to ensure the image covers the entire frame
-    const scale = Math.max(scaleX, scaleY) * 1.1 // Add 10% to ensure complete coverage
+    // Use the smaller scale to ensure the entire image fits without cropping
+    // Add a small margin (5%) to ensure no parts are cut off
+    const scale = Math.min(scaleX, scaleY) * 0.95
     
     // Calculate scaled dimensions
     const scaledWidth = img.width * scale
     const scaledHeight = img.height * scale
     
-    // Center the image to eliminate white space
+    // Center the image to ensure proper positioning
     const x = (canvasSize - scaledWidth) / 2
     const y = (canvasSize - scaledHeight) / 2
+    
+    // For portrait photos, we want to ensure the head is well-positioned
+    // If the image is taller than it is wide (portrait), adjust Y position
+    if (img.height > img.width) {
+      // For portraits, position the head slightly higher in the frame
+      // This ensures the head is never cut off at the top
+      const headOffset = (canvasSize - scaledHeight) * 0.1 // Move head up by 10% of available space
+      return { scale, x, y: y - headOffset }
+    }
     
     return { scale, x, y }
   }

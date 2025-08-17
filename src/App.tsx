@@ -504,56 +504,6 @@ function App() {
                     </button>
                   )}
                 </div>
-                
-                <div className="control-group">
-                  <h4>Crop Area</h4>
-                  <div className="crop-controls">
-                    <label>
-                      X Position: {crop.x.toFixed(1)}%
-                      <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={crop.x}
-                        onChange={(e) => setCrop(prev => ({ ...prev, x: parseFloat(e.target.value) }))}
-                        className="crop-slider"
-                      />
-                    </label>
-                    <label>
-                      Y Position: {crop.y.toFixed(1)}%
-                      <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={crop.y}
-                        onChange={(e) => setCrop(prev => ({ ...prev, y: parseFloat(e.target.value) }))}
-                        className="crop-slider"
-                      />
-                    </label>
-                    <label>
-                      Width: {crop.width.toFixed(1)}%
-                      <input
-                        type="range"
-                        min="20"
-                        max="100"
-                        value={crop.width}
-                        onChange={(e) => setCrop(prev => ({ ...prev, width: parseFloat(e.target.value) }))}
-                        className="crop-slider"
-                      />
-                    </label>
-                    <label>
-                      Height: {crop.height.toFixed(1)}%
-                      <input
-                        type="range"
-                        min="20"
-                        max="100"
-                        value={crop.height}
-                        onChange={(e) => setCrop(prev => ({ ...prev, height: parseFloat(e.target.value) }))}
-                        className="crop-slider"
-                      />
-                    </label>
-                  </div>
-                </div>
               </div>
             </div>
             

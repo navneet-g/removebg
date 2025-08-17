@@ -55,7 +55,7 @@ function App() {
   const [dragHandle, setDragHandle] = useState<string | null>(null)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const [showCropAndRotate, setShowCropAndRotate] = useState(false)
-  const [keepBackground, setKeepBackground] = useState(false)
+  const [changeBackgroundColor, setChangeBackgroundColor] = useState(false)
   const [backgroundColor, setBackgroundColor] = useState('#F5F5F5')
   const [currentView, setCurrentView] = useState<'upload' | 'editor' | 'result'>('upload')
   const [photoHistory, setPhotoHistory] = useState<Array<{
@@ -68,7 +68,7 @@ function App() {
     settings: {
       rotation: number
       crop: { x: number; y: number; width: number; height: number }
-      keepBackground: boolean
+      changeBackgroundColor: boolean
       backgroundColor: string
     }
   }>>([])
@@ -147,7 +147,7 @@ function App() {
       settings: {
         rotation,
         crop,
-        keepBackground,
+        changeBackgroundColor,
         backgroundColor
       }
     }
@@ -341,7 +341,7 @@ function App() {
   const resetEdits = () => {
     setRotation(0)
     setCrop({ x: 0, y: 0, width: 100, height: 100 })
-    setKeepBackground(false)
+    setChangeBackgroundColor(false)
     setBackgroundColor('#F5F5F5')
   }
 
@@ -360,13 +360,13 @@ function App() {
     canvas.width = size
     canvas.height = size
     
-    if (keepBackground) {
+    if (changeBackgroundColor) {
       // Change background - fill with selected background color
       ctx.fillStyle = backgroundColor
       ctx.fillRect(0, 0, size, size)
     } else {
-      // Keep original background - use transparent background
-      ctx.clearRect(0, 0, size, size)
+      // Keep original background - don't fill anything, let the image show through
+      // The canvas will be transparent by default
     }
     
     // Calculate optimal scaling and positioning for passport photo requirements
@@ -574,8 +574,14 @@ function App() {
     try {
       let processedBlob: Blob
       
-      // Always remove background first, then apply custom color if needed
-      processedBlob = await removeBackground(imageUrl)
+      if (changeBackgroundColor) {
+        // Remove background first, then apply custom color
+        processedBlob = await removeBackground(imageUrl)
+      } else {
+        // Keep original background - convert imageUrl to blob
+        const response = await fetch(imageUrl)
+        processedBlob = await response.blob()
+      }
       
       // Load the processed image
       const img = new Image()
@@ -651,7 +657,7 @@ function App() {
     setRotation(0)
     setCrop({ x: 0, y: 0, width: 100, height: 100 })
     setPrintablePage(null)
-    setKeepBackground(false)
+    setChangeBackgroundColor(false)
     setBackgroundColor('#F5F5F5')
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
@@ -696,7 +702,7 @@ function App() {
     // Restore all the settings
     setRotation(photo.settings.rotation)
     setCrop(photo.settings.crop)
-    setKeepBackground(photo.settings.keepBackground)
+    setChangeBackgroundColor(photo.settings.changeBackgroundColor)
     setBackgroundColor(photo.settings.backgroundColor)
     
     setShowEditor(false)
@@ -942,14 +948,14 @@ function App() {
                 <label className="toggle-switch">
                   <input
                     type="checkbox"
-                    checked={keepBackground}
-                    onChange={(e) => setKeepBackground(e.target.checked)}
+                    checked={changeBackgroundColor}
+                    onChange={(e) => setChangeBackgroundColor(e.target.checked)}
                   />
                   <span className="toggle-slider"></span>
                 </label>
                 <span className="toggle-label">Change Background Color</span>
                 
-                {keepBackground && (
+                {changeBackgroundColor && (
                   <>
                     <label className="color-picker-label">Color:</label>
                     <input
@@ -1105,7 +1111,7 @@ function App() {
                   'Create Passport Photo'
                 )}
               </button>
-              {(rotation !== 0 || crop.x !== 0 || crop.y !== 0 || crop.width !== 100 || crop.height !== 100 || keepBackground || backgroundColor !== '#F5F5F5') && (
+              {(rotation !== 0 || crop.x !== 0 || crop.y !== 0 || crop.width !== 100 || crop.height !== 100 || changeBackgroundColor || backgroundColor !== '#F5F5F5') && (
                 <button onClick={resetEdits} className="reset-edits-btn">
                   Reset Edits
                 </button>

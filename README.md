@@ -4,6 +4,8 @@
 
 A React web app that creates 2x2 passport photos meeting **USA and India passport specifications** by removing backgrounds and replacing them with pure white backgrounds.
 
+<!-- Updated for removebg repository -->
+
 ## ✨ Features
 
 - **Exact Specifications**: 2" × 2" (51mm × 51mm) dimensions

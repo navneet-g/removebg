@@ -53,7 +53,7 @@ function App() {
   const [rotation, setRotation] = useState(0)
   const [crop, setCrop] = useState({ x: 0, y: 0, width: 100, height: 100 })
   const fileInputRef = useRef<HTMLInputElement>(null)
-
+  const canvasRef = useRef<HTMLCanvasElement>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [dragHandle, setDragHandle] = useState<string | null>(null)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
@@ -102,23 +102,35 @@ function App() {
     }
   }
 
+  const rotateImage = (direction: 'left' | 'right') => {
+    setRotation(prev => {
+      const newRotation = direction === 'left' ? prev - 90 : prev + 90
+      return newRotation % 360
+    })
+  }
 
+  const rotateImageFine = (direction: 'left' | 'right') => {
+    setRotation(prev => {
+      const increment = 1 // 1 degree increments
+      const newRotation = direction === 'left' ? prev - increment : prev + increment
+      return newRotation
+    })
+  }
 
   const setRotationExact = (degrees: number) => {
     setRotation(degrees)
   }
 
   const applyEdits = () => {
-    if (!selectedImage) return
+    if (!selectedImage || !canvasRef.current) return
+
+    const canvas = canvasRef.current
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
 
     const img = new Image()
     img.onload = () => {
-      // Create a temporary canvas for processing
-      const canvas = document.createElement('canvas')
-      const ctx = canvas.getContext('2d')
-      if (!ctx) return
-
-      // Set canvas size to match the image
+      // Set canvas size
       canvas.width = img.width
       canvas.height = img.height
 
@@ -166,7 +178,7 @@ function App() {
       setShowEditor(false)
     }
 
-    img.src = editedImage || URL.createObjectURL(selectedImage)
+    img.src = URL.createObjectURL(selectedImage)
   }
 
   const resetEdits = () => {
@@ -476,59 +488,101 @@ function App() {
             
             <div className="editor-container">
               <div className="image-editor">
-                <div className="editor-preview-container">
-                  <button 
-                    className="rotate-btn rotate-left"
-                    onClick={() => setRotation(prev => prev - 1)}
-                    title="Rotate Left 1°"
+                <canvas
+                  ref={canvasRef}
+                  className="editor-canvas"
+                  style={{ display: 'none' }}
+                />
+                <div className="image-preview-container">
+                  <img 
+                    src={URL.createObjectURL(selectedImage)} 
+                    alt="Edit" 
+                    className="editor-preview-image"
+                    style={{
+                      transform: `rotate(${rotation}deg)`,
+                      transformOrigin: 'center'
+                    }}
+                  />
+                  <div 
+                    className="crop-overlay"
+                    style={{
+                      left: `${crop.x}%`,
+                      top: `${crop.y}%`,
+                      width: `${crop.width}%`,
+                      height: `${crop.height}%`
+                    }}
                   >
-                    ↶
-                  </button>
-                  
-                  <div className="image-preview-container">
-                    <img 
-                      src={editedImage || URL.createObjectURL(selectedImage)} 
-                      alt="Edit" 
-                      className="editor-preview-image"
-                      style={{
-                        transform: `rotate(${rotation}deg)`,
-                        transformOrigin: 'center'
-                      }}
-                    />
-                    <div 
-                      className="crop-overlay"
-                      style={{
-                        left: `${crop.x}%`,
-                        top: `${crop.y}%`,
-                        width: `${crop.width}%`,
-                        height: `${crop.height}%`
-                      }}
-                    >
-                      <div className="crop-handle crop-handle-top-left" onMouseDown={(e) => handleMouseDown(e, 'top-left')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
-                      <div className="crop-handle crop-handle-top-right" onMouseDown={(e) => handleMouseDown(e, 'top-right')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
-                      <div className="crop-handle crop-handle-bottom-left" onMouseDown={(e) => handleMouseDown(e, 'bottom-left')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
-                      <div className="crop-handle crop-handle-bottom-right" onMouseDown={(e) => handleMouseDown(e, 'bottom-right')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
-                      <div className="crop-handle crop-handle-top" onMouseDown={(e) => handleMouseDown(e, 'top')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
-                      <div className="crop-handle crop-handle-bottom" onMouseDown={(e) => handleMouseDown(e, 'bottom')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
-                      <div className="crop-handle crop-handle-left" onMouseDown={(e) => handleMouseDown(e, 'left')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
-                      <div className="crop-handle crop-handle-right" onMouseDown={(e) => handleMouseDown(e, 'right')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
-                      <div className="crop-handle crop-handle-move" onMouseDown={(e) => handleMouseDown(e, 'move')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
-                    </div>
+                    <div className="crop-handle crop-handle-top-left" onMouseDown={(e) => handleMouseDown(e, 'top-left')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
+                    <div className="crop-handle crop-handle-top-right" onMouseDown={(e) => handleMouseDown(e, 'top-right')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
+                    <div className="crop-handle crop-handle-bottom-left" onMouseDown={(e) => handleMouseDown(e, 'bottom-left')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
+                    <div className="crop-handle crop-handle-bottom-right" onMouseDown={(e) => handleMouseDown(e, 'bottom-right')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
+                    <div className="crop-handle crop-handle-top" onMouseDown={(e) => handleMouseDown(e, 'top')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
+                    <div className="crop-handle crop-handle-bottom" onMouseDown={(e) => handleMouseDown(e, 'bottom')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
+                    <div className="crop-handle crop-handle-left" onMouseDown={(e) => handleMouseDown(e, 'left')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
+                    <div className="crop-handle crop-handle-right" onMouseDown={(e) => handleMouseDown(e, 'right')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
+                    <div className="crop-handle crop-handle-move" onMouseDown={(e) => handleMouseDown(e, 'move')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
                   </div>
-                  
-                  <button 
-                    className="rotate-btn rotate-right"
-                    onClick={() => setRotation(prev => prev + 1)}
-                    title="Rotate Right 1°"
-                  >
-                    ↷
-                  </button>
                 </div>
               </div>
               
               <div className="editor-controls">
                 <div className="control-group">
-                  <h4>Current Rotation: {rotation}°</h4>
+                  <h4>Rotation</h4>
+                  <div className="rotation-controls">
+                    <button 
+                      onClick={() => rotateImage('left')} 
+                      className="control-btn rotation-btn"
+                    >
+                      ↶ Rotate Left 90°
+                    </button>
+                    <button 
+                      onClick={() => rotateImage('right')} 
+                      className="control-btn rotation-btn"
+                    >
+                      ↷ Rotate Right 90°
+                    </button>
+                  </div>
+                  
+                  <div className="fine-rotation-controls">
+                    <h5>Fine Tune</h5>
+                    <div className="fine-rotation-buttons">
+                      <button 
+                        onClick={() => rotateImageFine('left')} 
+                        className="control-btn fine-rotation-btn"
+                      >
+                        ↶ -1°
+                      </button>
+                      <button 
+                        onClick={() => rotateImageFine('right')} 
+                        className="control-btn fine-rotation-btn"
+                      >
+                        ↷ +1°
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className="rotation-input">
+                    <label>
+                      Exact Rotation:
+                      <div className="rotation-input-group">
+                        <input
+                          type="number"
+                          min="-360"
+                          max="360"
+                          step="1"
+                          value={rotation}
+                          onChange={(e) => setRotationExact(parseFloat(e.target.value) || 0)}
+                          className="rotation-number-input"
+                        />
+                        <span className="degree-symbol">°</span>
+                      </div>
+                    </label>
+                  </div>
+                  
+                  <div className="rotation-display">
+                    Current: {rotation}°
+                  </div>
+                  
                   {rotation !== 0 && (
                     <button 
                       onClick={() => setRotationExact(0)} 

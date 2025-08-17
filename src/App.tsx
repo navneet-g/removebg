@@ -701,10 +701,7 @@ function App() {
                       alt="Passport Photo" 
                       className="comparison-image passport-photo"
                     />
-                    <div className="photo-overlay">
-                      <div className="size-indicator">2" × 2"</div>
-                      <div className="coverage-indicator">Max Coverage</div>
-                    </div>
+
                   </div>
                 </div>
               </div>

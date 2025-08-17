@@ -482,31 +482,34 @@ body {
 .editor-section {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 20px;
-  padding: 2rem;
+  padding: 1.5rem;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  text-align: center;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .editor-section h3 {
   color: #333;
   margin-bottom: 0.5rem;
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-weight: 600;
+  text-align: center;
 }
 
 .editor-hint {
   color: #666;
   font-size: 1rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   font-style: italic;
+  text-align: center;
 }
 
 .editor-container {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 2rem;
+  grid-template-columns: 1fr 350px;
+  gap: 1.5rem;
   align-items: start;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .image-editor {
@@ -575,27 +578,24 @@ body {
 .editor-controls {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.2rem;
+  height: fit-content;
+  position: sticky;
+  top: 20px;
 }
 
 .control-group {
   background: rgba(102, 126, 234, 0.05);
   border-radius: 15px;
-  padding: 1.5rem;
+  padding: 1.2rem;
   border: 1px solid rgba(102, 126, 234, 0.2);
 }
 
 .control-group h4 {
-  color: #667eea;
-  margin-bottom: 1rem;
-  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 0.8rem;
+  font-size: 1rem;
   font-weight: 600;
-}
-
-.rotation-controls {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
 }
 
 .control-btn {
@@ -620,9 +620,15 @@ body {
   box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
 }
 
+.rotation-controls {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
 .fine-rotation-controls {
   margin-bottom: 1rem;
-  padding: 1rem;
+  padding: 0.8rem;
   background: rgba(76, 175, 80, 0.05);
   border-radius: 10px;
   border: 1px solid rgba(76, 175, 80, 0.2);
@@ -630,21 +636,21 @@ body {
 
 .fine-rotation-controls h5 {
   color: #4CAF50;
-  margin-bottom: 0.75rem;
-  font-size: 0.9rem;
+  margin-bottom: 0.6rem;
+  font-size: 0.85rem;
   font-weight: 600;
 }
 
 .fine-rotation-buttons {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.4rem;
   justify-content: center;
 }
 
 .fine-rotation-btn {
   background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
   color: white;
-  padding: 0.4rem 0.8rem;
+  padding: 0.3rem 0.7rem;
   font-size: 0.8rem;
 }
 
@@ -660,7 +666,7 @@ body {
 .rotation-input label {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.4rem;
   color: #333;
   font-size: 0.9rem;
   font-weight: 500;
@@ -669,12 +675,12 @@ body {
 .rotation-input-group {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
 .rotation-number-input {
   width: 80px;
-  padding: 0.5rem;
+  padding: 0.4rem;
   border: 2px solid #ddd;
   border-radius: 8px;
   font-size: 1rem;
@@ -691,7 +697,7 @@ body {
 .degree-symbol {
   color: #4CAF50;
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 
 .rotation-display {
@@ -699,7 +705,7 @@ body {
   font-weight: 600;
   font-size: 0.9rem;
   background: rgba(102, 126, 234, 0.1);
-  padding: 0.5rem;
+  padding: 0.4rem;
   border-radius: 10px;
   margin-bottom: 0.5rem;
 }
@@ -720,13 +726,13 @@ body {
 .crop-controls {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.8rem;
 }
 
 .crop-controls label {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.4rem;
   color: #333;
   font-size: 0.9rem;
   font-weight: 500;
@@ -759,22 +765,22 @@ body {
   border-radius: 50%;
   background: #4CAF50;
   cursor: pointer;
-  border: 2px solid white;
+  border: none;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .editor-actions {
   display: flex;
-  gap: 1rem;
+  gap: 0.8rem;
   justify-content: center;
   flex-wrap: wrap;
 }
 
 .apply-btn, .reset-edits-btn, .edit-again-btn {
-  padding: 0.75rem 1.5rem;
+  padding: 0.6rem 1.2rem;
   border: none;
   border-radius: 25px;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -812,99 +818,28 @@ body {
   box-shadow: 0 8px 25px rgba(156, 39, 176, 0.4);
 }
 
-/* Responsive design */
+/* Responsive design for mobile */
 @media (max-width: 768px) {
-  .app-header h1 {
-    font-size: 2rem;
-  }
-  
-  .app-main {
-    padding: 1rem;
-    max-width: 100%;
-  }
-  
-  .upload-area {
-    padding: 2rem 1rem;
-  }
-  
-  .action-buttons {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .process-btn, .download-btn, .reset-btn {
-    width: 100%;
-    max-width: 300px;
-  }
-
-  .image-comparison {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-
-  .comparison-item h4 {
-    font-size: 1.1rem;
-  }
-
-  .comparison-image {
-    max-height: 300px;
-  }
-
-  .specs-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .compliance-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .validation-grid {
-    grid-template-columns: 1fr;
-  }
-
   .editor-container {
     grid-template-columns: 1fr;
-    gap: 1.5rem;
+    gap: 1rem;
   }
-
+  
   .editor-controls {
-    order: -1;
+    position: static;
+    order: 1;
   }
-
-  .control-group {
-    padding: 1rem;
+  
+  .image-editor {
+    order: 2;
   }
-
-  .rotation-controls {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .fine-rotation-controls {
-    padding: 0.75rem;
-  }
-
-  .fine-rotation-buttons {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .rotation-input-group {
-    justify-content: center;
-  }
-
-  .rotation-number-input {
-    width: 100px;
-  }
-
+  
   .editor-actions {
     flex-direction: column;
-    align-items: center;
   }
-
+  
   .apply-btn, .reset-edits-btn, .edit-again-btn {
     width: 100%;
-    max-width: 300px;
   }
 }
 

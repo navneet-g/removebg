@@ -557,6 +557,41 @@ function App() {
               <div className="editor-controls">
                 <div className="control-group">
                   <h4>Current Rotation: {rotation}°</h4>
+                  
+                  <div className="fine-rotation-controls">
+                    <h5>Fine Tune Rotation</h5>
+                    <div className="fine-rotation-buttons">
+                      <button 
+                        onClick={() => setRotation(prev => prev - 2)} 
+                        className="control-btn fine-rotation-btn"
+                        title="Rotate Left 2°"
+                      >
+                        ↶ -2°
+                      </button>
+                      <button 
+                        onClick={() => setRotation(prev => prev - 1)} 
+                        className="control-btn fine-rotation-btn"
+                        title="Rotate Left 1°"
+                      >
+                        ↶ -1°
+                      </button>
+                      <button 
+                        onClick={() => setRotation(prev => prev + 1)} 
+                        className="control-btn fine-rotation-btn"
+                        title="Rotate Right 1°"
+                      >
+                        ↷ +1°
+                      </button>
+                      <button 
+                        onClick={() => setRotation(prev => prev + 2)} 
+                        className="control-btn fine-rotation-btn"
+                        title="Rotate Right 2°"
+                      >
+                        ↷ +2°
+                      </button>
+                    </div>
+                  </div>
+                  
                   {rotation !== 0 && (
                     <button 
                       onClick={() => setRotationExact(0)} 

@@ -51,7 +51,19 @@ function App() {
   } | null>(null)
   const [showEditor, setShowEditor] = useState(false)
   const [rotation, setRotation] = useState(0)
-  const [crop, setCrop] = useState({ x: 0, y: 0, width: 100, height: 100 })
+  const [crop, setCrop] = useState<{
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    scale: number;
+  }>({
+    x: 0,
+    y: 0,
+    width: 100,
+    height: 100,
+    scale: 1,
+  });
   const fileInputRef = useRef<HTMLInputElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -65,7 +77,7 @@ function App() {
       setPhotoValidation(null)
       setShowEditor(true)
       setRotation(0)
-      setCrop({ x: 0, y: 0, width: 100, height: 100 })
+      setCrop({ x: 0, y: 0, width: 100, height: 100, scale: 1 })
     }
   }
 
@@ -94,7 +106,7 @@ function App() {
         setPhotoValidation(null)
         setShowEditor(true)
         setRotation(0)
-        setCrop({ x: 0, y: 0, width: 100, height: 100 })
+        setCrop({ x: 0, y: 0, width: 100, height: 100, scale: 1 })
       }
     }
   }
@@ -180,7 +192,7 @@ function App() {
 
   const resetEdits = () => {
     setRotation(0)
-    setCrop({ x: 0, y: 0, width: 100, height: 100 })
+    setCrop({ x: 0, y: 0, width: 100, height: 100, scale: 1 })
   }
 
   const validatePassportPhoto = (canvas: HTMLCanvasElement): {
@@ -330,7 +342,7 @@ function App() {
     setPhotoValidation(null)
     setShowEditor(false)
     setRotation(0)
-    setCrop({ x: 0, y: 0, width: 100, height: 100 })
+    setCrop({ x: 0, y: 0, width: 100, height: 100, scale: 1 })
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
@@ -398,178 +410,142 @@ function App() {
           </div>
         )}
 
-        {selectedImage && showEditor && (
-          <div className="editor-section">
+      {/* Image Editor */}
+      {selectedImage && showEditor && (
+        <div className="editor-section">
+          <div className="editor-header">
             <h3>Edit Your Image</h3>
-            <p className="editor-hint">Rotate and crop your image for better results</p>
+          </div>
+          
+          <div className="editor-content">
+            {/* Canvas Container */}
+            <div className="editor-canvas-container">
+              <canvas
+                ref={canvasRef}
+                className="editor-canvas"
+                width={400}
+                height={400}
+              />
+            </div>
             
-            <div className="editor-container">
-              <div className="image-editor">
-                <canvas
-                  ref={canvasRef}
-                  className="editor-canvas"
-                  style={{ display: 'none' }}
-                />
-                <div className="image-preview-container">
-                  <img 
-                    src={URL.createObjectURL(selectedImage)} 
-                    alt="Edit" 
-                    className="editor-preview-image"
-                    style={{
-                      transform: `rotate(${rotation}deg)`,
-                      transformOrigin: 'center'
-                    }}
+            {/* Controls Panel */}
+            <div className="editor-controls">
+              {/* Rotation Controls */}
+              <div className="control-group">
+                <h4>Rotation</h4>
+                <div className="rotation-controls">
+                  <button onClick={() => rotateImage('left')} className="rotation-btn">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M7.11 8.53L5.7 7.12C7.56 5.26 10.44 5.26 12.3 7.12L10.89 8.53C9.5 7.14 7.5 7.14 6.11 8.53L7.11 8.53Z"/>
+                    </svg>
+                    Rotate Left
+                  </button>
+                  <button onClick={() => rotateImage('right')} className="rotation-btn">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M16.89 8.53L18.3 7.12C16.44 5.26 13.56 5.26 11.7 7.12L13.11 8.53C14.5 7.14 16.5 7.14 17.89 8.53L16.89 8.53Z"/>
+                    </svg>
+                    Rotate Right
+                  </button>
+                </div>
+                
+                <div className="fine-rotation-controls">
+                  <button onClick={() => rotateImageFine('left')} className="fine-rotation-btn">
+                    ↺ -1°
+                  </button>
+                  <button onClick={() => rotateImageFine('right')} className="fine-rotation-btn">
+                    ↻ +1°
+                  </button>
+                </div>
+                
+                <div className="exact-rotation-control">
+                  <input
+                    type="number"
+                    value={rotation}
+                    onChange={(e) => setRotationExact(Number(e.target.value))}
+                    className="exact-rotation-input"
+                    placeholder="0"
+                    min="-180"
+                    max="180"
                   />
-                  <div 
-                    className="crop-overlay"
-                    style={{
-                      left: `${crop.x}%`,
-                      top: `${crop.y}%`,
-                      width: `${crop.width}%`,
-                      height: `${crop.height}%`
-                    }}
-                  >
-                    <div className="crop-handle crop-handle-top-left"></div>
-                    <div className="crop-handle crop-handle-top-right"></div>
-                    <div className="crop-handle crop-handle-bottom-left"></div>
-                    <div className="crop-handle crop-handle-bottom-right"></div>
+                  <button onClick={() => setRotationExact(0)} className="exact-rotation-btn">
+                    Reset
+                  </button>
+                </div>
+                
+                <div className="control-row">
+                  <span className="control-label">Current:</span>
+                  <span className="control-value">{rotation}°</span>
+                </div>
+              </div>
+              
+              {/* Crop Controls */}
+              <div className="control-group">
+                <h4>Crop & Scale</h4>
+                <div className="crop-controls">
+                  <div className="crop-slider-group">
+                    <div className="crop-slider-row">
+                      <span className="crop-slider-label">Scale:</span>
+                      <input
+                        type="range"
+                        min="0.5"
+                        max="2"
+                        step="0.1"
+                        value={crop.scale}
+                        onChange={(e) => setCrop(prev => ({ ...prev, scale: Number(e.target.value) }))}
+                        className="crop-slider"
+                      />
+                      <span className="crop-value">{crop.scale}x</span>
+                    </div>
+                  </div>
+                  
+                  <div className="crop-slider-group">
+                    <div className="crop-slider-row">
+                      <span className="crop-slider-label">X:</span>
+                      <input
+                        type="range"
+                        min="-100"
+                        max="100"
+                        value={crop.x}
+                        onChange={(e) => setCrop(prev => ({ ...prev, x: Number(e.target.value) }))}
+                        className="crop-slider"
+                      />
+                      <span className="crop-value">{crop.x}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="crop-slider-group">
+                    <div className="crop-slider-row">
+                      <span className="crop-slider-label">Y:</span>
+                      <input
+                        type="range"
+                        min="-100"
+                        max="100"
+                        value={crop.y}
+                        onChange={(e) => setCrop(prev => ({ ...prev, y: Number(e.target.value) }))}
+                        className="crop-slider"
+                      />
+                      <span className="crop-value">{crop.y}</span>
+                    </div>
                   </div>
                 </div>
               </div>
               
-              <div className="editor-controls">
-                <div className="control-group">
-                  <h4>Rotation</h4>
-                  <div className="rotation-controls">
-                    <button 
-                      onClick={() => rotateImage('left')} 
-                      className="control-btn rotation-btn"
-                    >
-                      ↶ Rotate Left 90°
-                    </button>
-                    <button 
-                      onClick={() => rotateImage('right')} 
-                      className="control-btn rotation-btn"
-                    >
-                      ↷ Rotate Right 90°
-                    </button>
-                  </div>
-                  
-                  <div className="fine-rotation-controls">
-                    <h5>Fine Tune</h5>
-                    <div className="fine-rotation-buttons">
-                      <button 
-                        onClick={() => rotateImageFine('left')} 
-                        className="control-btn fine-rotation-btn"
-                      >
-                        ↶ -1°
-                      </button>
-                      <button 
-                        onClick={() => rotateImageFine('right')} 
-                        className="control-btn fine-rotation-btn"
-                      >
-                        ↷ +1°
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div className="rotation-input">
-                    <label>
-                      Exact Rotation:
-                      <div className="rotation-input-group">
-                        <input
-                          type="number"
-                          min="-360"
-                          max="360"
-                          step="1"
-                          value={rotation}
-                          onChange={(e) => setRotationExact(parseFloat(e.target.value) || 0)}
-                          className="rotation-number-input"
-                        />
-                        <span className="degree-symbol">°</span>
-                      </div>
-                    </label>
-                  </div>
-                  
-                  <div className="rotation-display">
-                    Current: {rotation}°
-                  </div>
-                  
-                  {rotation !== 0 && (
-                    <button 
-                      onClick={() => setRotationExact(0)} 
-                      className="control-btn reset-rotation-btn"
-                    >
-                      Reset to 0°
-                    </button>
-                  )}
-                </div>
-                
-                <div className="control-group">
-                  <h4>Crop Area</h4>
-                  <div className="crop-controls">
-                    <label>
-                      X Position: {crop.x.toFixed(1)}%
-                      <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={crop.x}
-                        onChange={(e) => setCrop(prev => ({ ...prev, x: parseFloat(e.target.value) }))}
-                        className="crop-slider"
-                      />
-                    </label>
-                    <label>
-                      Y Position: {crop.y.toFixed(1)}%
-                      <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={crop.y}
-                        onChange={(e) => setCrop(prev => ({ ...prev, y: parseFloat(e.target.value) }))}
-                        className="crop-slider"
-                      />
-                    </label>
-                    <label>
-                      Width: {crop.width.toFixed(1)}%
-                      <input
-                        type="range"
-                        min="20"
-                        max="100"
-                        value={crop.width}
-                        onChange={(e) => setCrop(prev => ({ ...prev, width: parseFloat(e.target.value) }))}
-                        className="crop-slider"
-                      />
-                    </label>
-                    <label>
-                      Height: {crop.height.toFixed(1)}%
-                      <input
-                        type="range"
-                        min="20"
-                        max="100"
-                        value={crop.height}
-                        onChange={(e) => setCrop(prev => ({ ...prev, height: parseFloat(e.target.value) }))}
-                        className="crop-slider"
-                      />
-                    </label>
-                  </div>
-                </div>
+              {/* Action Buttons */}
+              <div className="editor-actions">
+                <button onClick={applyEdits} className="apply-btn">
+                  Apply Edits & Continue
+                </button>
+                <button onClick={resetEdits} className="reset-edits-btn">
+                  Reset Edits
+                </button>
+                <button onClick={resetApp} className="reset-btn">
+                  Select Different Image
+                </button>
               </div>
             </div>
-            
-            <div className="editor-actions">
-              <button onClick={applyEdits} className="apply-btn">
-                Apply Edits & Continue
-              </button>
-              <button onClick={resetEdits} className="reset-edits-btn">
-                Reset Edits
-              </button>
-              <button onClick={resetApp} className="reset-btn">
-                Select Different Image
-              </button>
-            </div>
           </div>
-        )}
+        </div>
+      )}
 
         {selectedImage && !showEditor && !processedImage && (
           <div className="preview-section">

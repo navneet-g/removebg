@@ -53,7 +53,7 @@ function App() {
   const [rotation, setRotation] = useState(0)
   const [crop, setCrop] = useState({ x: 0, y: 0, width: 100, height: 100 })
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+
   const [isDragging, setIsDragging] = useState(false)
   const [dragHandle, setDragHandle] = useState<string | null>(null)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
@@ -187,12 +187,7 @@ function App() {
     }
   }
 
-  const rotateImage = (direction: 'left' | 'right') => {
-    setRotation(prev => {
-      const newRotation = direction === 'left' ? prev - 90 : prev + 90
-      return newRotation % 360
-    })
-  }
+
 
 
 
@@ -201,15 +196,16 @@ function App() {
   }
 
   const applyEdits = () => {
-    if (!selectedImage || !canvasRef.current) return
-
-    const canvas = canvasRef.current
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
+    if (!selectedImage) return
 
     const img = new Image()
     img.onload = () => {
-      // Set canvas size
+      // Create a temporary canvas for processing
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return
+
+      // Set canvas size to match the image
       canvas.width = img.width
       canvas.height = img.height
 
@@ -257,7 +253,7 @@ function App() {
       setShowEditor(false)
     }
 
-    img.src = URL.createObjectURL(selectedImage)
+    img.src = editedImage || URL.createObjectURL(selectedImage)
   }
 
   const resetEdits = () => {
@@ -506,8 +502,8 @@ function App() {
                 <div className="editor-preview-container">
                   <button 
                     className="rotate-btn rotate-left"
-                    onClick={() => rotateImage('left')}
-                    title="Rotate Left 90°"
+                    onClick={() => setRotation(prev => prev - 1)}
+                    title="Rotate Left 1°"
                   >
                     ↶
                   </button>
@@ -546,8 +542,8 @@ function App() {
                   
                   <button 
                     className="rotate-btn rotate-right"
-                    onClick={() => rotateImage('right')}
-                    title="Rotate Right 90°"
+                    onClick={() => setRotation(prev => prev + 1)}
+                    title="Rotate Right 1°"
                   >
                     ↷
                   </button>
@@ -557,40 +553,6 @@ function App() {
               <div className="editor-controls">
                 <div className="control-group">
                   <h4>Current Rotation: {rotation}°</h4>
-                  
-                  <div className="fine-rotation-controls">
-                    <h5>Fine Tune Rotation</h5>
-                    <div className="fine-rotation-buttons">
-                      <button 
-                        onClick={() => setRotation(prev => prev - 2)} 
-                        className="control-btn fine-rotation-btn"
-                        title="Rotate Left 2°"
-                      >
-                        ↶ -2°
-                      </button>
-                      <button 
-                        onClick={() => setRotation(prev => prev - 1)} 
-                        className="control-btn fine-rotation-btn"
-                        title="Rotate Left 1°"
-                      >
-                        ↶ -1°
-                      </button>
-                      <button 
-                        onClick={() => setRotation(prev => prev + 1)} 
-                        className="control-btn fine-rotation-btn"
-                        title="Rotate Right 1°"
-                      >
-                        ↷ +1°
-                      </button>
-                      <button 
-                        onClick={() => setRotation(prev => prev + 2)} 
-                        className="control-btn fine-rotation-btn"
-                        title="Rotate Right 2°"
-                      >
-                        ↷ +2°
-                      </button>
-                    </div>
-                  </div>
                   
                   {rotation !== 0 && (
                     <button 

@@ -540,7 +540,9 @@ body {
 }
 
 .rotate-btn {
-  position: relative;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
   width: 40px;
   height: 40px;
   border: none;
@@ -560,20 +562,20 @@ body {
 
 .rotate-btn:hover {
   background: rgba(76, 175, 80, 1);
-  transform: scale(1.1);
+  transform: translateY(-50%) scale(1.1);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .rotate-btn:active {
-  transform: scale(0.95);
+  transform: translateY(-50%) scale(0.95);
 }
 
 .rotate-left {
-  order: 1;
+  left: 10px;
 }
 
 .rotate-right {
-  order: 3;
+  right: 10px;
 }
 
 .editor-preview-image {
@@ -732,45 +734,7 @@ body {
   box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
 }
 
-.fine-rotation-controls {
-  margin-bottom: 1rem;
-  padding: 0.8rem;
-  background: rgba(76, 175, 80, 0.05);
-  border-radius: 8px;
-  border: 1px solid rgba(76, 175, 80, 0.2);
-}
 
-.fine-rotation-controls h5 {
-  color: #4CAF50;
-  margin-bottom: 0.6rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-align: center;
-}
-
-.fine-rotation-buttons {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.fine-rotation-btn {
-  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-  color: white;
-  padding: 0.3rem 0.7rem;
-  font-size: 0.75rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  min-width: 60px;
-}
-
-.fine-rotation-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
-}
 
 .editor-actions {
   display: flex;

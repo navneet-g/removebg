@@ -63,7 +63,6 @@ function App() {
     height: 100,
   });
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -129,15 +128,16 @@ function App() {
   }
 
   const applyEdits = () => {
-    if (!selectedImage || !canvasRef.current) return
+    if (!selectedImage) return
 
-    const canvas = canvasRef.current
+    // Create a canvas to apply the edits
+    const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
     const img = new Image()
     img.onload = () => {
-      // Set canvas size
+      // Set canvas size to match the image
       canvas.width = img.width
       canvas.height = img.height
 
@@ -179,10 +179,15 @@ function App() {
         0, 0, cropWidth, cropHeight
       )
 
-      // Convert to data URL
-      const editedImageUrl = croppedCanvas.toDataURL('image/png')
-      setEditedImage(editedImageUrl)
-      setShowEditor(false)
+      // Convert to blob for the editedImage state
+      croppedCanvas.toBlob((blob) => {
+        if (blob) {
+          // Create a URL from the blob
+          const editedImageUrl = URL.createObjectURL(blob)
+          setEditedImage(editedImageUrl)
+          setShowEditor(false)
+        }
+      }, 'image/png')
     }
 
     img.src = URL.createObjectURL(selectedImage)

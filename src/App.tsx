@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { removeBackground } from '@imgly/background-removal'
 import './App.css'
 
@@ -56,102 +56,14 @@ function App() {
     y: number;
     width: number;
     height: number;
-    scale: number;
   }>({
     x: 0,
     y: 0,
     width: 100,
     height: 100,
-    scale: 1,
   });
   const fileInputRef = useRef<HTMLInputElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
-
-  // Add useEffect to render image on canvas when editor opens
-  useEffect(() => {
-    if (selectedImage && showEditor && canvasRef.current) {
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
-      const img = new Image();
-      img.onload = () => {
-        // Clear canvas
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // Calculate image dimensions to fit canvas
-        const canvasSize = Math.min(canvas.width, canvas.height);
-        const scale = Math.min(canvasSize / img.width, canvasSize / img.height);
-        const scaledWidth = img.width * scale;
-        const scaledHeight = img.height * scale;
-        
-        // Save context state
-        ctx.save();
-        
-        // Move to center for rotation
-        ctx.translate(canvas.width / 2, canvas.height / 2);
-        ctx.rotate((rotation * Math.PI) / 180);
-        
-        // Draw the image
-        ctx.drawImage(
-          img,
-          -scaledWidth / 2,
-          -scaledHeight / 2,
-          scaledWidth,
-          scaledHeight
-        );
-        
-        // Restore context
-        ctx.restore();
-      };
-      img.src = URL.createObjectURL(selectedImage);
-    }
-  }, [selectedImage, showEditor, rotation, crop]);
-
-  // Update canvas when rotation or crop changes
-  useEffect(() => {
-    if (selectedImage && showEditor && canvasRef.current) {
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
-      const img = new Image();
-      img.onload = () => {
-        // Clear canvas
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // Calculate image dimensions to fit canvas
-        const canvasSize = Math.min(canvas.width, canvas.height);
-        const scale = Math.min(canvasSize / img.width, canvasSize / img.height) * crop.scale;
-        const scaledWidth = img.width * scale;
-        const scaledHeight = img.height * scale;
-        
-        // Apply crop positioning
-        const offsetX = (crop.x / 100) * (canvasSize - scaledWidth);
-        const offsetY = (crop.y / 100) * (canvasSize - scaledHeight);
-        
-        // Save context state
-        ctx.save();
-        
-        // Move to center for rotation
-        ctx.translate(canvas.width / 2, canvas.height / 2);
-        ctx.rotate((rotation * Math.PI) / 180);
-        
-        // Draw the image
-        ctx.drawImage(
-          img,
-          -scaledWidth / 2 + offsetX,
-          -scaledHeight / 2 + offsetY,
-          scaledWidth,
-          scaledHeight
-        );
-        
-        // Restore context
-        ctx.restore();
-      };
-      img.src = URL.createObjectURL(selectedImage);
-    }
-  }, [rotation, crop]);
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -163,7 +75,7 @@ function App() {
       setPhotoValidation(null)
       setShowEditor(true)
       setRotation(0)
-      setCrop({ x: 0, y: 0, width: 100, height: 100, scale: 1 })
+      setCrop({ x: 0, y: 0, width: 100, height: 100 })
     }
   }
 
@@ -192,7 +104,7 @@ function App() {
         setPhotoValidation(null)
         setShowEditor(true)
         setRotation(0)
-        setCrop({ x: 0, y: 0, width: 100, height: 100, scale: 1 })
+        setCrop({ x: 0, y: 0, width: 100, height: 100 })
       }
     }
   }
@@ -278,7 +190,7 @@ function App() {
 
   const resetEdits = () => {
     setRotation(0)
-    setCrop({ x: 0, y: 0, width: 100, height: 100, scale: 1 })
+    setCrop({ x: 0, y: 0, width: 100, height: 100 })
   }
 
   const validatePassportPhoto = (canvas: HTMLCanvasElement): {
@@ -428,7 +340,7 @@ function App() {
     setPhotoValidation(null)
     setShowEditor(false)
     setRotation(0)
-    setCrop({ x: 0, y: 0, width: 100, height: 100, scale: 1 })
+    setCrop({ x: 0, y: 0, width: 100, height: 100 })
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
@@ -506,12 +418,31 @@ function App() {
           <div className="editor-content">
             {/* Canvas Container */}
             <div className="editor-canvas-container">
-              <canvas
-                ref={canvasRef}
-                className="editor-canvas"
-                width={400}
-                height={400}
-              />
+              <div className="image-preview-container">
+                <img 
+                  src={URL.createObjectURL(selectedImage)} 
+                  alt="Edit" 
+                  className="editor-preview-image"
+                  style={{
+                    transform: `rotate(${rotation}deg)`,
+                    transformOrigin: 'center'
+                  }}
+                />
+                <div 
+                  className="crop-overlay"
+                  style={{
+                    left: `${crop.x}%`,
+                    top: `${crop.y}%`,
+                    width: `${crop.width}%`,
+                    height: `${crop.height}%`
+                  }}
+                >
+                  <div className="crop-handle crop-handle-top-left"></div>
+                  <div className="crop-handle crop-handle-top-right"></div>
+                  <div className="crop-handle crop-handle-bottom-left"></div>
+                  <div className="crop-handle crop-handle-bottom-right"></div>
+                </div>
+              </div>
               {selectedImage && (
                 <div style={{ marginTop: '10px', textAlign: 'center', color: '#666', fontSize: '0.9rem' }}>
                   Image loaded • Use controls to adjust rotation and crop
@@ -571,52 +502,58 @@ function App() {
               
               {/* Crop Controls */}
               <div className="control-group">
-                <h4>Crop & Scale</h4>
+                <h4>Crop Area</h4>
                 <div className="crop-controls">
-                  <div className="crop-slider-group">
-                    <div className="crop-slider-row">
-                      <span className="crop-slider-label">Scale:</span>
-                      <input
-                        type="range"
-                        min="0.5"
-                        max="2"
-                        step="0.1"
-                        value={crop.scale}
-                        onChange={(e) => setCrop(prev => ({ ...prev, scale: Number(e.target.value) }))}
-                        className="crop-slider"
-                      />
-                      <span className="crop-value">{crop.scale}x</span>
-                    </div>
+                  <div className="crop-slider-row">
+                    <span className="crop-slider-label">X Position:</span>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={crop.x}
+                      onChange={(e) => setCrop(prev => ({ ...prev, x: parseFloat(e.target.value) }))}
+                      className="crop-slider"
+                    />
+                    <span className="crop-value">{crop.x.toFixed(1)}%</span>
                   </div>
                   
-                  <div className="crop-slider-group">
-                    <div className="crop-slider-row">
-                      <span className="crop-slider-label">X:</span>
-                      <input
-                        type="range"
-                        min="-100"
-                        max="100"
-                        value={crop.x}
-                        onChange={(e) => setCrop(prev => ({ ...prev, x: Number(e.target.value) }))}
-                        className="crop-slider"
-                      />
-                      <span className="crop-value">{crop.x}</span>
-                    </div>
+                  <div className="crop-slider-row">
+                    <span className="crop-slider-label">Y Position:</span>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={crop.y}
+                      onChange={(e) => setCrop(prev => ({ ...prev, y: parseFloat(e.target.value) }))}
+                      className="crop-slider"
+                    />
+                    <span className="crop-value">{crop.y.toFixed(1)}%</span>
                   </div>
                   
-                  <div className="crop-slider-group">
-                    <div className="crop-slider-row">
-                      <span className="crop-slider-label">Y:</span>
-                      <input
-                        type="range"
-                        min="-100"
-                        max="100"
-                        value={crop.y}
-                        onChange={(e) => setCrop(prev => ({ ...prev, y: Number(e.target.value) }))}
-                        className="crop-slider"
-                      />
-                      <span className="crop-value">{crop.y}</span>
-                    </div>
+                  <div className="crop-slider-row">
+                    <span className="crop-slider-label">Width:</span>
+                    <input
+                      type="range"
+                      min="20"
+                      max="100"
+                      value={crop.width}
+                      onChange={(e) => setCrop(prev => ({ ...prev, width: parseFloat(e.target.value) }))}
+                      className="crop-slider"
+                    />
+                    <span className="crop-value">{crop.width.toFixed(1)}%</span>
+                  </div>
+                  
+                  <div className="crop-slider-row">
+                    <span className="crop-slider-label">Height:</span>
+                    <input
+                      type="range"
+                      min="20"
+                      max="100"
+                      value={crop.height}
+                      onChange={(e) => setCrop(prev => ({ ...prev, height: parseFloat(e.target.value) }))}
+                      className="crop-slider"
+                    />
+                    <span className="crop-value">{crop.height.toFixed(1)}%</span>
                   </div>
                 </div>
               </div>

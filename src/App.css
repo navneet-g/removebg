@@ -520,62 +520,12 @@ body {
   min-width: 0;
 }
 
-.editor-preview-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  height: 100%;
-  padding: 0 20px;
-}
-
 .image-preview-container {
   position: relative;
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-}
-
-.rotate-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 40px;
-  height: 40px;
-  border: none;
-  border-radius: 50%;
-  background: rgba(76, 175, 80, 0.9);
-  color: white;
-  font-size: 20px;
-  cursor: pointer;
-  z-index: 10;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  flex-shrink: 0;
-}
-
-.rotate-btn:hover {
-  background: rgba(76, 175, 80, 1);
-  transform: translateY(-50%) scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-}
-
-.rotate-btn:active {
-  transform: translateY(-50%) scale(0.95);
-}
-
-.rotate-left {
-  left: 10px;
-}
-
-.rotate-right {
-  right: 10px;
+  display: inline-block;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
 .editor-preview-image {
@@ -884,6 +834,44 @@ body {
 .edit-again-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(156, 39, 176, 0.4);
+}
+
+.rotate-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(76, 175, 80, 0.9);
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.rotate-btn:hover {
+  background: rgba(76, 175, 80, 1);
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.rotate-btn:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.rotate-left {
+  left: 10px;
+}
+
+.rotate-right {
+  right: 10px;
 }
 
 /* Responsive design for mobile */

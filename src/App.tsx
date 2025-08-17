@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { removeBackground } from '@imgly/background-removal'
 import './App.css'
 
@@ -66,6 +66,92 @@ function App() {
   });
   const fileInputRef = useRef<HTMLInputElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  // Add useEffect to render image on canvas when editor opens
+  useEffect(() => {
+    if (selectedImage && showEditor && canvasRef.current) {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      const img = new Image();
+      img.onload = () => {
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Calculate image dimensions to fit canvas
+        const canvasSize = Math.min(canvas.width, canvas.height);
+        const scale = Math.min(canvasSize / img.width, canvasSize / img.height);
+        const scaledWidth = img.width * scale;
+        const scaledHeight = img.height * scale;
+        
+        // Save context state
+        ctx.save();
+        
+        // Move to center for rotation
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate((rotation * Math.PI) / 180);
+        
+        // Draw the image
+        ctx.drawImage(
+          img,
+          -scaledWidth / 2,
+          -scaledHeight / 2,
+          scaledWidth,
+          scaledHeight
+        );
+        
+        // Restore context
+        ctx.restore();
+      };
+      img.src = URL.createObjectURL(selectedImage);
+    }
+  }, [selectedImage, showEditor, rotation, crop]);
+
+  // Update canvas when rotation or crop changes
+  useEffect(() => {
+    if (selectedImage && showEditor && canvasRef.current) {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      const img = new Image();
+      img.onload = () => {
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Calculate image dimensions to fit canvas
+        const canvasSize = Math.min(canvas.width, canvas.height);
+        const scale = Math.min(canvasSize / img.width, canvasSize / img.height) * crop.scale;
+        const scaledWidth = img.width * scale;
+        const scaledHeight = img.height * scale;
+        
+        // Apply crop positioning
+        const offsetX = (crop.x / 100) * (canvasSize - scaledWidth);
+        const offsetY = (crop.y / 100) * (canvasSize - scaledHeight);
+        
+        // Save context state
+        ctx.save();
+        
+        // Move to center for rotation
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate((rotation * Math.PI) / 180);
+        
+        // Draw the image
+        ctx.drawImage(
+          img,
+          -scaledWidth / 2 + offsetX,
+          -scaledHeight / 2 + offsetY,
+          scaledWidth,
+          scaledHeight
+        );
+        
+        // Restore context
+        ctx.restore();
+      };
+      img.src = URL.createObjectURL(selectedImage);
+    }
+  }, [rotation, crop]);
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -426,6 +512,11 @@ function App() {
                 width={400}
                 height={400}
               />
+              {selectedImage && (
+                <div style={{ marginTop: '10px', textAlign: 'center', color: '#666', fontSize: '0.9rem' }}>
+                  Image loaded • Use controls to adjust rotation and crop
+                </div>
+              )}
             </div>
             
             {/* Controls Panel */}

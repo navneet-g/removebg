@@ -494,14 +494,6 @@ function App() {
                   style={{ display: 'none' }}
                 />
                 <div className="image-preview-container">
-                  <button 
-                    className="rotate-btn rotate-left"
-                    onClick={() => setRotation(prev => prev - 1)}
-                    title="Rotate Left 1°"
-                  >
-                    ↶
-                  </button>
-                  
                   <img 
                     src={URL.createObjectURL(selectedImage)} 
                     alt="Edit" 
@@ -511,15 +503,6 @@ function App() {
                       transformOrigin: 'center'
                     }}
                   />
-                  
-                  <button 
-                    className="rotate-btn rotate-right"
-                    onClick={() => setRotation(prev => prev + 1)}
-                    title="Rotate Right 1°"
-                  >
-                    ↷
-                  </button>
-                  
                   <div 
                     className="crop-overlay"
                     style={{

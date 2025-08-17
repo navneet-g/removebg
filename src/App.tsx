@@ -512,16 +512,37 @@ function App() {
                     ↶
                   </button>
                   
-                  <img 
-                    src={editedImage || URL.createObjectURL(selectedImage)} 
-                    alt="Preview" 
-                    className="editor-preview-image"
-                    style={{
-                      transform: `rotate(${rotation}deg)`,
-                      transformOrigin: 'center'
-                    }}
-                    onMouseDown={(e) => handleMouseDown(e, 'move')}
-                  />
+                  <div className="image-preview-container">
+                    <img 
+                      src={editedImage || URL.createObjectURL(selectedImage)} 
+                      alt="Preview" 
+                      className="editor-preview-image"
+                      style={{
+                        transform: `rotate(${rotation}deg)`,
+                        transformOrigin: 'center'
+                      }}
+                      onMouseDown={(e) => handleMouseDown(e, 'move')}
+                    />
+                    <div 
+                      className="crop-overlay"
+                      style={{
+                        left: `${crop.x}%`,
+                        top: `${crop.y}%`,
+                        width: `${crop.width}%`,
+                        height: `${crop.height}%`
+                      }}
+                    >
+                      <div className="crop-handle crop-handle-top-left" onMouseDown={(e) => handleMouseDown(e, 'top-left')}></div>
+                      <div className="crop-handle crop-handle-top-right" onMouseDown={(e) => handleMouseDown(e, 'top-right')}></div>
+                      <div className="crop-handle crop-handle-bottom-left" onMouseDown={(e) => handleMouseDown(e, 'bottom-left')}></div>
+                      <div className="crop-handle crop-handle-bottom-right" onMouseDown={(e) => handleMouseDown(e, 'bottom-right')}></div>
+                      <div className="crop-handle crop-handle-top" onMouseDown={(e) => handleMouseDown(e, 'top')}></div>
+                      <div className="crop-handle crop-handle-bottom" onMouseDown={(e) => handleMouseDown(e, 'bottom')}></div>
+                      <div className="crop-handle crop-handle-left" onMouseDown={(e) => handleMouseDown(e, 'left')}></div>
+                      <div className="crop-handle crop-handle-right" onMouseDown={(e) => handleMouseDown(e, 'right')}></div>
+                      <div className="crop-handle crop-handle-move" onMouseDown={(e) => handleMouseDown(e, 'move')}></div>
+                    </div>
+                  </div>
                   
                   <button 
                     className="rotate-btn rotate-right"
@@ -530,26 +551,6 @@ function App() {
                   >
                     ↷
                   </button>
-                  
-                  <div 
-                    className="crop-overlay"
-                    style={{
-                      left: `${crop.x}%`,
-                      top: `${crop.y}%`,
-                      width: `${crop.width}%`,
-                      height: `${crop.height}%`
-                    }}
-                  >
-                    <div className="crop-handle crop-handle-top-left" onMouseDown={(e) => handleMouseDown(e, 'top-left')}></div>
-                    <div className="crop-handle crop-handle-top-right" onMouseDown={(e) => handleMouseDown(e, 'top-right')}></div>
-                    <div className="crop-handle crop-handle-bottom-left" onMouseDown={(e) => handleMouseDown(e, 'bottom-left')}></div>
-                    <div className="crop-handle crop-handle-bottom-right" onMouseDown={(e) => handleMouseDown(e, 'bottom-right')}></div>
-                    <div className="crop-handle crop-handle-top" onMouseDown={(e) => handleMouseDown(e, 'top')}></div>
-                    <div className="crop-handle crop-handle-bottom" onMouseDown={(e) => handleMouseDown(e, 'bottom')}></div>
-                    <div className="crop-handle crop-handle-left" onMouseDown={(e) => handleMouseDown(e, 'left')}></div>
-                    <div className="crop-handle crop-handle-right" onMouseDown={(e) => handleMouseDown(e, 'right')}></div>
-                    <div className="crop-handle crop-handle-move" onMouseDown={(e) => handleMouseDown(e, 'move')}></div>
-                  </div>
                 </div>
               </div>
               

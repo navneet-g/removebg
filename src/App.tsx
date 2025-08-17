@@ -54,7 +54,7 @@ function App() {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const [showCropAndRotate, setShowCropAndRotate] = useState(false)
 
-  // Add global mouse event listeners to handle mouse up outside the image
+  // Add global mouse and touch event listeners to handle interactions outside the image
   useEffect(() => {
     const handleGlobalMouseUp = () => {
       if (isDragging) {
@@ -63,79 +63,101 @@ function App() {
       }
     }
 
+    const handleGlobalTouchEnd = () => {
+      if (isDragging) {
+        setIsDragging(false)
+        setDragHandle(null)
+      }
+    }
+
     const handleGlobalMouseMove = (e: MouseEvent) => {
       if (isDragging && dragHandle) {
-        // Only handle mouse move if we're actually dragging
-        const deltaX = e.clientX - dragStart.x
-        const deltaY = e.clientY - dragStart.y
-        
-        const container = document.querySelector('.image-preview-container')
-        if (!container) return
-        
-        const rect = container.getBoundingClientRect()
-        const containerWidth = rect.width
-        const containerHeight = rect.height
-        
-        const deltaXPercent = (deltaX / containerWidth) * 100
-        const deltaYPercent = (deltaY / containerHeight) * 100
-        
-        setCrop(prev => {
-          const newCrop = { ...prev }
-          
-          switch (dragHandle) {
-            case 'top-left':
-              newCrop.x = Math.max(0, Math.min(prev.x + deltaXPercent, prev.x + prev.width - 20))
-              newCrop.y = Math.max(0, Math.min(prev.y + deltaYPercent, prev.y + prev.height - 20))
-              newCrop.width = Math.max(20, prev.width - deltaXPercent)
-              newCrop.height = Math.max(20, prev.height - deltaYPercent)
-              break
-            case 'top-right':
-              newCrop.y = Math.max(0, Math.min(prev.y + deltaYPercent, prev.y + prev.height - 20))
-              newCrop.width = Math.max(20, prev.width + deltaXPercent)
-              newCrop.height = Math.max(20, prev.height - deltaYPercent)
-              break
-            case 'bottom-left':
-              newCrop.x = Math.max(0, Math.min(prev.x + deltaXPercent, prev.x + prev.width - 20))
-              newCrop.width = Math.max(20, prev.width - deltaXPercent)
-              newCrop.height = Math.max(20, prev.height + deltaYPercent)
-              break
-            case 'bottom-right':
-              newCrop.width = Math.max(20, prev.width + deltaXPercent)
-              newCrop.height = Math.max(20, prev.height + deltaYPercent)
-              break
-            case 'top':
-              newCrop.y = Math.max(0, Math.min(prev.y + deltaYPercent, prev.y + prev.height - 20))
-              newCrop.height = Math.max(20, prev.height - deltaYPercent)
-              break
-            case 'bottom':
-              newCrop.height = Math.max(20, prev.height + deltaYPercent)
-              break
-            case 'left':
-              newCrop.x = Math.max(0, Math.min(prev.x + deltaXPercent, prev.x + prev.width - 20))
-              newCrop.width = Math.max(20, prev.width - deltaXPercent)
-              break
-            case 'right':
-              newCrop.width = Math.max(20, prev.width + deltaXPercent)
-              break
-            case 'move':
-              newCrop.x = Math.max(0, Math.min(100 - prev.width, prev.x + deltaXPercent))
-              newCrop.y = Math.max(0, Math.min(100 - prev.height, prev.y + deltaYPercent))
-              break
-          }
-          
-          return newCrop
-        })
-        
-        setDragStart({ x: e.clientX, y: e.clientY })
+        handleMove(e.clientX, e.clientY)
       }
+    }
+
+    const handleGlobalTouchMove = (e: TouchEvent) => {
+      if (isDragging && dragHandle && e.touches.length > 0) {
+        e.preventDefault() // Prevent scrolling while dragging
+        const touch = e.touches[0]
+        handleMove(touch.clientX, touch.clientY)
+      }
+    }
+
+    const handleMove = (clientX: number, clientY: number) => {
+      const deltaX = clientX - dragStart.x
+      const deltaY = clientY - dragStart.y
+      
+      const container = document.querySelector('.image-preview-container')
+      if (!container) return
+      
+      const rect = container.getBoundingClientRect()
+      const containerWidth = rect.width
+      const containerHeight = rect.height
+      
+      const deltaXPercent = (deltaX / containerWidth) * 100
+      const deltaYPercent = (deltaY / containerHeight) * 100
+      
+      setCrop(prev => {
+        const newCrop = { ...prev }
+        
+        switch (dragHandle) {
+          case 'top-left':
+            newCrop.x = Math.max(0, Math.min(prev.x + deltaXPercent, prev.x + prev.width - 20))
+            newCrop.y = Math.max(0, Math.min(prev.y + deltaYPercent, prev.y + prev.height - 20))
+            newCrop.width = Math.max(20, prev.width - deltaXPercent)
+            newCrop.height = Math.max(20, prev.height - deltaYPercent)
+            break
+          case 'top-right':
+            newCrop.y = Math.max(0, Math.min(prev.y + deltaYPercent, prev.y + prev.height - 20))
+            newCrop.width = Math.max(20, prev.width + deltaXPercent)
+            newCrop.height = Math.max(20, prev.height - deltaYPercent)
+            break
+          case 'bottom-left':
+            newCrop.x = Math.max(0, Math.min(prev.x + deltaXPercent, prev.x + prev.width - 20))
+            newCrop.width = Math.max(20, prev.width - deltaXPercent)
+            newCrop.height = Math.max(20, prev.height + deltaYPercent)
+            break
+          case 'bottom-right':
+            newCrop.width = Math.max(20, prev.width + deltaXPercent)
+            newCrop.height = Math.max(20, prev.height + deltaYPercent)
+            break
+          case 'top':
+            newCrop.y = Math.max(0, Math.min(prev.y + deltaYPercent, prev.y + prev.height - 20))
+            newCrop.height = Math.max(20, prev.height - deltaYPercent)
+            break
+          case 'bottom':
+            newCrop.height = Math.max(20, prev.height + deltaYPercent)
+            break
+          case 'left':
+            newCrop.x = Math.max(0, Math.min(prev.x + deltaXPercent, prev.x + prev.width - 20))
+            newCrop.width = Math.max(20, prev.width - deltaXPercent)
+            break
+          case 'right':
+            newCrop.width = Math.max(20, prev.width + deltaXPercent)
+            break
+          case 'move':
+            newCrop.x = Math.max(0, Math.min(100 - prev.width, prev.x + deltaXPercent))
+            newCrop.y = Math.max(0, Math.min(100 - prev.height, prev.y + deltaYPercent))
+            break
+        }
+        
+        return newCrop
+      })
+      
+      setDragStart({ x: clientX, y: clientY })
     }
 
     document.addEventListener('mouseup', handleGlobalMouseUp)
     document.addEventListener('mousemove', handleGlobalMouseMove)
+    document.addEventListener('touchend', handleGlobalTouchEnd, { passive: false })
+    document.addEventListener('touchmove', handleGlobalTouchMove, { passive: false })
 
     return () => {
       document.removeEventListener('mouseup', handleGlobalMouseUp)
       document.removeEventListener('mousemove', handleGlobalMouseMove)
+      document.removeEventListener('touchend', handleGlobalTouchEnd)
+      document.removeEventListener('touchmove', handleGlobalTouchMove)
     }
   }, [isDragging, dragHandle, dragStart])
 
@@ -437,6 +459,16 @@ function App() {
     setDragStart({ x: e.clientX, y: e.clientY })
   }
 
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>, handle: string) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (e.touches.length > 0) {
+      setIsDragging(true)
+      setDragHandle(handle)
+      setDragStart({ x: e.touches[0].clientX, y: e.touches[0].clientY })
+    }
+  }
+
   const handleMouseUp = () => {
     setIsDragging(false)
     setDragHandle(null)
@@ -496,6 +528,7 @@ function App() {
               <div className="image-editor" 
                 onMouseLeave={handleMouseUp}
                 onMouseUp={handleMouseUp}
+                onTouchEnd={handleMouseUp}
               >
                 <canvas
                   ref={canvasRef}
@@ -512,6 +545,7 @@ function App() {
                       transformOrigin: 'center'
                     }}
                     onMouseDown={(e) => handleMouseDown(e, 'move')}
+                    onTouchStart={(e) => handleTouchStart(e, 'move')}
                   />
                   {showCropAndRotate && (
                     <div 
@@ -523,15 +557,15 @@ function App() {
                         height: `${crop.height}%`
                       }}
                     >
-                      <div className="crop-handle crop-handle-top-left" onMouseDown={(e) => handleMouseDown(e, 'top-left')}></div>
-                      <div className="crop-handle crop-handle-top-right" onMouseDown={(e) => handleMouseDown(e, 'top-right')}></div>
-                      <div className="crop-handle crop-handle-bottom-left" onMouseDown={(e) => handleMouseDown(e, 'bottom-left')}></div>
-                      <div className="crop-handle crop-handle-bottom-right" onMouseDown={(e) => handleMouseDown(e, 'bottom-right')}></div>
-                      <div className="crop-handle crop-handle-top" onMouseDown={(e) => handleMouseDown(e, 'top')}></div>
-                      <div className="crop-handle crop-handle-bottom" onMouseDown={(e) => handleMouseDown(e, 'bottom')}></div>
-                      <div className="crop-handle crop-handle-left" onMouseDown={(e) => handleMouseDown(e, 'left')}></div>
-                      <div className="crop-handle crop-handle-right" onMouseDown={(e) => handleMouseDown(e, 'right')}></div>
-                      <div className="crop-handle crop-handle-move" onMouseDown={(e) => handleMouseDown(e, 'move')}></div>
+                      <div className="crop-handle crop-handle-top-left" onMouseDown={(e) => handleMouseDown(e, 'top-left')} onTouchStart={(e) => handleTouchStart(e, 'top-left')}></div>
+                      <div className="crop-handle crop-handle-top-right" onMouseDown={(e) => handleMouseDown(e, 'top-right')} onTouchStart={(e) => handleTouchStart(e, 'top-right')}></div>
+                      <div className="crop-handle crop-handle-bottom-left" onMouseDown={(e) => handleMouseDown(e, 'bottom-left')} onTouchStart={(e) => handleTouchStart(e, 'bottom-left')}></div>
+                      <div className="crop-handle crop-handle-bottom-right" onMouseDown={(e) => handleMouseDown(e, 'bottom-right')} onTouchStart={(e) => handleTouchStart(e, 'bottom-right')}></div>
+                      <div className="crop-handle crop-handle-top" onMouseDown={(e) => handleMouseDown(e, 'top')} onTouchStart={(e) => handleTouchStart(e, 'top')}></div>
+                      <div className="crop-handle crop-handle-bottom" onMouseDown={(e) => handleMouseDown(e, 'bottom')} onTouchStart={(e) => handleTouchStart(e, 'bottom')}></div>
+                      <div className="crop-handle crop-handle-left" onMouseDown={(e) => handleMouseDown(e, 'left')} onTouchStart={(e) => handleTouchStart(e, 'left')}></div>
+                      <div className="crop-handle crop-handle-right" onMouseDown={(e) => handleMouseDown(e, 'right')} onTouchStart={(e) => handleTouchStart(e, 'right')}></div>
+                      <div className="crop-handle crop-handle-move" onMouseDown={(e) => handleMouseDown(e, 'move')} onTouchStart={(e) => handleTouchStart(e, 'move')}></div>
                     </div>
                   )}
                 </div>

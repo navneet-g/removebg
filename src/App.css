@@ -472,8 +472,8 @@ body {
 
 .crop-handle {
   position: absolute;
-  width: 32px;
-  height: 32px;
+  width: 16px;
+  height: 16px;
   background: #6366f1;
   border: 3px solid white;
   border-radius: 50%;
@@ -482,8 +482,8 @@ body {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   transition: all 0.2s ease;
   /* Touch-friendly sizing */
-  min-width: 32px;
-  min-height: 32px;
+  min-width: 16px;
+  min-height: 16px;
   /* Ensure good touch target */
   touch-action: manipulation;
 }
@@ -562,52 +562,52 @@ body {
 }
 
 .crop-handle-top-left {
-  top: -16px;
-  left: -16px;
+  top: -8px;
+  left: -8px;
   cursor: nw-resize;
 }
 
 .crop-handle-top-right {
-  top: -16px;
-  right: -16px;
+  top: -8px;
+  right: -8px;
   cursor: ne-resize;
 }
 
 .crop-handle-bottom-left {
-  bottom: -16px;
-  left: -16px;
+  bottom: -8px;
+  left: -8px;
   cursor: sw-resize;
 }
 
 .crop-handle-bottom-right {
-  bottom: -16px;
-  right: -16px;
+  bottom: -8px;
+  right: -8px;
   cursor: se-resize;
 }
 
 .crop-handle-top {
-  top: -16px;
+  top: -8px;
   left: 50%;
   transform: translateX(-50%);
   cursor: n-resize;
 }
 
 .crop-handle-bottom {
-  bottom: -16px;
+  bottom: -8px;
   left: 50%;
   transform: translateX(-50%);
   cursor: s-resize;
 }
 
 .crop-handle-left {
-  left: -16px;
+  left: -8px;
   top: 50%;
   transform: translateY(-50%);
   cursor: w-resize;
 }
 
 .crop-handle-right {
-  right: -16px;
+  right: -8px;
   top: 50%;
   transform: translateY(-50%);
   cursor: e-resize;

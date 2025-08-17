@@ -33,7 +33,7 @@ git push origin main
 1. Go to **Actions** tab in your repository
 2. You'll see the "Deploy to GitHub Pages" workflow running
 3. Wait for it to complete (usually 2-3 minutes)
-4. Your app will be available at: `https://navneet-g.github.io/remvoebg/`
+4. Your app will be available at: `https://navneet-g.github.io/removebg/`
 
 ## 🛠️ Option 2: Manual Deployment
 
@@ -61,7 +61,7 @@ npm run deploy
 ### **Vite Configuration**
 
 The `vite.config.ts` is configured with:
-- **Base Path**: `/remvoebg/` for production (matches your repository name)
+- **Base Path**: `/removebg/` for production (matches your repository name)
 - **Build Output**: `dist` directory
 - **Asset Optimization**: Disabled manual chunks for better compatibility
 
@@ -150,7 +150,7 @@ npm run deploy
 ## 🎉 Success!
 
 Once deployed, your passport photo creator will be available at:
-**`https://navneet-g.github.io/remvoebg/`**
+**`https://navneet-g.github.io/removebg/`**
 
 Share this URL with users to access your app from anywhere!
 

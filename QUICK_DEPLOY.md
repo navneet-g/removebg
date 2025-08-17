@@ -21,7 +21,7 @@ git push origin main
 ### **3. Wait for Deployment**
 - Check **Actions** tab for progress
 - Deployment takes ~2-3 minutes
-- Your app will be live at: `https://yourusername.github.io/remvoebg/`
+- Your app will be live at: `https://yourusername.github.io/removebg/`
 
 ## 🔧 **What's Already Configured**
 
@@ -29,7 +29,7 @@ git push origin main
 - ✅ Vite configuration for GitHub Pages
 - ✅ Build scripts in package.json
 - ✅ gh-pages dependency installed
-- ✅ Base path set to `/remvoebg/`
+- ✅ Base path set to `/removebg/`
 
 ## 🚨 **If Something Goes Wrong**
 
@@ -41,7 +41,7 @@ git push origin main
 ## 🎉 **Success!**
 
 Once deployed, share your app URL:
-**`https://navneet-g.github.io/remvoebg/`**
+**`https://navneet-g.github.io/removebg/`**
 
 ---
 

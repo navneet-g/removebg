@@ -71,7 +71,7 @@ jobs:
       run: |
         if [ "${{ job.status }}" == "success" ]; then
           echo "✅ Deployment successful!"
-          echo "🌐 Your app is now live at: https://navneet-g.github.io/remvoebg/"
+          echo "🌐 Your app is now live at: https://navneet-g.github.io/removebg/"
         else
           echo "❌ Deployment failed!"
           echo "Please check the GitHub Actions logs for details."

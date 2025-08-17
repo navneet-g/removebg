@@ -6,7 +6,7 @@ The GitHub Actions workflow is failing because GitHub Pages isn't enabled in you
 ## 🔧 **Manual Setup Required**
 
 ### **Step 1: Go to Repository Settings**
-1. Visit: `https://github.com/navneet-g/remvoebg`
+1. Visit: `https://github.com/navneet-g/removebg`
 2. Click the **Settings** tab (near the top of the page)
 
 ### **Step 2: Navigate to Pages Section**
@@ -35,7 +35,7 @@ After saving, you should see:
 ### **Configures Workflow**
 - ✅ Workflow can now access Pages settings
 - ✅ Deployment will succeed
-- ✅ Site will be available at `https://navneet-g.github.io/remvoebg/`
+- ✅ Site will be available at `https://navneet-g.github.io/removebg/`
 
 ## 🚨 **If You Don't See Pages Option**
 
@@ -64,7 +64,7 @@ git push origin main
 
 ### **3. Check Live Site**
 - Wait 2-3 minutes for deployment
-- Visit: `https://navneet-g.github.io/remvoebg/`
+- Visit: `https://navneet-g.github.io/removebg/`
 - Your app should be live!
 
 ## 📱 **Alternative: Use GitHub CLI**

@@ -65,7 +65,7 @@ git push origin main
 ### **Check Pages Tab**
 - [ ] Go to **Settings** → **Pages**
 - [ ] Should show "Your site is live at..."
-- [ ] URL: `https://yourusername.github.io/remvoebg/`
+- [ ] URL: `https://yourusername.github.io/removebg/`
 
 ### **Test Live Site**
 - [ ] Visit your live URL
@@ -125,7 +125,7 @@ git push origin main
 
 ### **Your App URL**
 Once working, your app will be automatically updated at:
-**`https://navneet-g.github.io/remvoebg/`**
+**`https://navneet-g.github.io/removebg/`**
 
 ---
 

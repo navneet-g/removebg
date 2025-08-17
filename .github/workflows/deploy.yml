@@ -9,13 +9,26 @@ on:
       - 'README.md'
       - 'DEPLOYMENT.md'
       - 'QUICK_DEPLOY.md'
+      - 'AUTOMATIC_UPDATE_CHECKLIST.md'
   pull_request:
     branches: [ main, master ]
   workflow_dispatch: # Allow manual triggering
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     
     steps:
     - name: Checkout
@@ -33,22 +46,20 @@ jobs:
     - name: Build
       run: npm run build
       
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./dist
-        cname: # Add your custom domain here if you have one
-        force_orphan: true # Ensures clean deployment
-        
-    - name: Deployment Status
-      if: always()
+    - name: Test build output
       run: |
-        if [ "${{ job.status }}" == "success" ]; then
-          echo "✅ Deployment successful!"
-          echo "🌐 Your app is now live at: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
-        else
-          echo "❌ Deployment failed!"
-          exit 1
-        fi
+        echo "Checking build output..."
+        ls -la dist/
+        echo "Build completed successfully!"
+      
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+      
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: './dist'
+        
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4

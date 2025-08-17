@@ -11,7 +11,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%);
   min-height: 100vh;
 }
 
@@ -21,14 +21,22 @@ body {
   flex-direction: column;
 }
 
+/* Touch device specific improvements */
+.touch-device .app {
+  /* Optimize for touch interactions */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* Header styles */
 .app-header {
   text-align: center;
   padding: 2rem 1rem;
   color: white;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .app-header h1 {
@@ -58,28 +66,28 @@ body {
 
 .upload-area {
   background: rgba(255, 255, 255, 0.95);
-  border: 3px dashed #667eea;
-  border-radius: 20px;
+  border: 3px dashed #6366f1;
+  border-radius: 24px;
   padding: 3rem 2rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   position: relative;
   margin-bottom: 2rem;
 }
 
 .upload-area:hover {
-  border-color: #764ba2;
+  border-color: #8b5cf6;
   background: rgba(255, 255, 255, 1);
   transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 20px 60px rgba(139, 92, 246, 0.2);
 }
 
 .upload-area.drag-over {
-  border-color: #4CAF50;
-  background: rgba(76, 175, 80, 0.1);
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
   transform: scale(1.02);
-  box-shadow: 0 15px 45px rgba(76, 175, 80, 0.3);
+  box-shadow: 0 25px 70px rgba(16, 185, 129, 0.3);
 }
 
 .upload-icon {
@@ -211,35 +219,36 @@ body {
 }
 
 .download-btn {
-  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
 }
 
 .download-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
 }
 
 .regenerate-btn {
-  background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   color: white;
 }
 
 .regenerate-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(255, 152, 0, 0.4);
+  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
 }
 
 .reset-btn {
-  background: rgba(255, 255, 255, 0.9);
-  color: #333;
-  border: 2px solid #ddd;
+  background: rgba(255, 255, 255, 0.95);
+  color: #374151;
+  border: 2px solid #e5e7eb;
 }
 
 .reset-btn:hover {
   background: white;
-  border-color: #999;
+  border-color: #d1d5db;
   transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
 /* Processing section */
@@ -254,8 +263,8 @@ body {
 .loading-spinner {
   width: 60px;
   height: 60px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #667eea;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-top: 4px solid #6366f1;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 2rem;
@@ -453,82 +462,152 @@ body {
 
 .crop-overlay {
   position: absolute;
-  border: 2px dashed #4CAF50;
-  background: rgba(76, 175, 80, 0.1);
+  border: 2px dashed #6366f1;
+  background: rgba(99, 102, 241, 0.1);
   pointer-events: none;
   cursor: move;
+  /* Touch-friendly improvements */
+  touch-action: none;
 }
 
 .crop-handle {
   position: absolute;
-  width: 16px;
-  height: 16px;
-  background: #4CAF50;
+  width: 32px;
+  height: 32px;
+  background: #6366f1;
   border: 3px solid white;
   border-radius: 50%;
   pointer-events: all;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   transition: all 0.2s ease;
+  /* Touch-friendly sizing */
+  min-width: 32px;
+  min-height: 32px;
+  /* Ensure good touch target */
+  touch-action: manipulation;
 }
 
 .crop-handle:hover {
-  background: #45a049;
-  transform: scale(1.2);
+  background: #4f46e5;
+  transform: scale(1.1);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
+/* Touch device optimizations - will be dynamically applied via JavaScript */
+.touch-device .crop-handle {
+  /* Larger touch targets for mobile */
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+}
+
+.touch-device .crop-handle-top-left {
+  top: -20px;
+  left: -20px;
+}
+
+.touch-device .crop-handle-top-right {
+  top: -20px;
+  right: -20px;
+}
+
+.touch-device .crop-handle-bottom-left {
+  bottom: -20px;
+  left: -20px;
+}
+
+.touch-device .crop-handle-bottom-right {
+  bottom: -20px;
+  right: -20px;
+}
+
+.touch-device .crop-handle-top {
+  top: -20px;
+}
+
+.touch-device .crop-handle-bottom {
+  bottom: -20px;
+}
+
+.touch-device .crop-handle-left {
+  left: -20px;
+}
+
+.touch-device .crop-handle-right {
+  right: -20px;
+}
+
+/* Additional touch device optimizations */
+.touch-device .editor-section {
+  /* Better touch scrolling */
+  -webkit-overflow-scrolling: touch;
+}
+
+.touch-device .image-preview-container {
+  /* Prevent zoom on double-tap */
+  touch-action: pan-x pan-y;
+}
+
+.touch-device .crop-overlay {
+  /* Better touch interaction */
+  touch-action: none;
+}
+
 .crop-handle:active {
-  transform: scale(1.1);
+  transform: scale(1.05);
+  background: #4338ca;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .crop-handle-top-left {
-  top: -8px;
-  left: -8px;
+  top: -16px;
+  left: -16px;
   cursor: nw-resize;
 }
 
 .crop-handle-top-right {
-  top: -8px;
-  right: -8px;
+  top: -16px;
+  right: -16px;
   cursor: ne-resize;
 }
 
 .crop-handle-bottom-left {
-  bottom: -8px;
-  left: -8px;
+  bottom: -16px;
+  left: -16px;
   cursor: sw-resize;
 }
 
 .crop-handle-bottom-right {
-  bottom: -8px;
-  right: -8px;
+  bottom: -16px;
+  right: -16px;
   cursor: se-resize;
 }
 
 .crop-handle-top {
-  top: -8px;
+  top: -16px;
   left: 50%;
   transform: translateX(-50%);
   cursor: n-resize;
 }
 
 .crop-handle-bottom {
-  bottom: -8px;
+  bottom: -16px;
   left: 50%;
   transform: translateX(-50%);
   cursor: s-resize;
 }
 
 .crop-handle-left {
-  left: -8px;
+  left: -16px;
   top: 50%;
   transform: translateY(-50%);
   cursor: w-resize;
 }
 
 .crop-handle-right {
-  right: -8px;
+  right: -16px;
   top: 50%;
   transform: translateY(-50%);
   cursor: e-resize;
@@ -723,13 +802,13 @@ body {
 }
 
 .create-passport-btn {
-  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
   color: white;
 }
 
 .create-passport-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
 }
 
 .create-passport-btn:disabled {
@@ -741,13 +820,13 @@ body {
 }
 
 .reset-edits-btn {
-  background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   color: white;
 }
 
 .reset-edits-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(255, 152, 0, 0.4);
+  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
 }
 
 .reset-edits-btn:disabled {
@@ -759,13 +838,13 @@ body {
 }
 
 .edit-again-btn {
-  background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
   color: white;
 }
 
 .edit-again-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(156, 39, 176, 0.4);
+  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
 }
 
 .edit-again-btn:disabled {
@@ -819,7 +898,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ccc;
+  background-color: #9ca3af;
   transition: 0.3s;
   border-radius: 24px;
 }
@@ -837,7 +916,7 @@ body {
 }
 
 input:checked + .toggle-slider {
-  background-color: #667eea;
+  background-color: #6366f1;
 }
 
 input:checked + .toggle-slider:before {

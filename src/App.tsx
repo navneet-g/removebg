@@ -43,12 +43,7 @@ function App() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isDragOver, setIsDragOver] = useState(false)
-  const [photoValidation, setPhotoValidation] = useState<{
-    dimensions: boolean;
-    background: boolean;
-    positioning: boolean;
-    quality: boolean;
-  } | null>(null)
+
   const [showEditor, setShowEditor] = useState(false)
   const [rotation, setRotation] = useState(0)
   const [crop, setCrop] = useState({ x: 0, y: 0, width: 100, height: 100 })
@@ -151,7 +146,6 @@ function App() {
       setEditedImage(null)
       setProcessedImage(null)
       setError(null)
-      setPhotoValidation(null)
       setShowEditor(true)
       setRotation(0)
       setCrop({ x: 0, y: 0, width: 100, height: 100 })
@@ -180,7 +174,6 @@ function App() {
         setEditedImage(null)
         setProcessedImage(null)
         setError(null)
-        setPhotoValidation(null)
         setShowEditor(true)
         setRotation(0)
         setCrop({ x: 0, y: 0, width: 100, height: 100 })
@@ -207,109 +200,14 @@ function App() {
     setRotation(degrees)
   }
 
-  const applyEdits = () => {
-    if (!selectedImage || !canvasRef.current) return
 
-    const canvas = canvasRef.current
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    const img = new Image()
-    img.onload = () => {
-      // Set canvas size
-      canvas.width = img.width
-      canvas.height = img.height
-
-      // Clear canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-      // Save context
-      ctx.save()
-
-      // Move to center for rotation
-      ctx.translate(canvas.width / 2, canvas.height / 2)
-      ctx.rotate((rotation * Math.PI) / 180)
-      ctx.translate(-canvas.width / 2, -canvas.height / 2)
-
-      // Draw rotated image
-      ctx.drawImage(img, 0, 0)
-
-      // Restore context
-      ctx.restore()
-
-      // Apply cropping
-      const cropX = (crop.x / 100) * canvas.width
-      const cropY = (crop.y / 100) * canvas.height
-      const cropWidth = (crop.width / 100) * canvas.width
-      const cropHeight = (crop.height / 100) * canvas.height
-
-      // Create new canvas for cropped image
-      const croppedCanvas = document.createElement('canvas')
-      const croppedCtx = croppedCanvas.getContext('2d')
-      if (!croppedCtx) return
-
-      croppedCanvas.width = cropWidth
-      croppedCanvas.height = cropHeight
-
-      // Draw cropped portion
-      croppedCtx.drawImage(
-        canvas,
-        cropX, cropY, cropWidth, cropHeight,
-        0, 0, cropWidth, cropHeight
-      )
-
-      // Convert to data URL
-      const editedImageUrl = croppedCanvas.toDataURL('image/png')
-      setEditedImage(editedImageUrl)
-      setShowEditor(false)
-    }
-
-    img.src = URL.createObjectURL(selectedImage)
-  }
 
   const resetEdits = () => {
     setRotation(0)
     setCrop({ x: 0, y: 0, width: 100, height: 100 })
   }
 
-  const validatePassportPhoto = (canvas: HTMLCanvasElement): {
-    dimensions: boolean;
-    background: boolean;
-    positioning: boolean;
-    quality: boolean;
-  } => {
-    const ctx = canvas.getContext('2d')
-    if (!ctx) {
-      throw new Error('Failed to get canvas context')
-    }
 
-    // Check dimensions
-    const dimensions = canvas.width === PASSPORT_SPECS.dimensions.pixels && 
-                     canvas.height === PASSPORT_SPECS.dimensions.pixels
-
-    // Check background (sample center pixels to ensure white background)
-    const centerX = canvas.width / 2
-    const centerY = canvas.height / 2
-    const imageData = ctx.getImageData(centerX - 10, centerY - 10, 20, 20)
-    const data = imageData.data
-    
-    let background = true
-    for (let i = 0; i < data.length; i += 4) {
-      // Check if pixel is not white (allowing small variations for anti-aliasing)
-      if (data[i] < 250 || data[i + 1] < 250 || data[i + 2] < 250) {
-        background = false
-        break
-      }
-    }
-
-    // Check positioning (ensure maximum frame utilization)
-    const positioning = true // This is handled in the new positioning algorithm
-
-    // Check quality (ensure 300 DPI equivalent)
-    const quality = canvas.width >= PASSPORT_SPECS.dimensions.pixels
-
-    return { dimensions, background, positioning, quality }
-  }
 
   const createPassportPhoto = (img: HTMLImageElement): string => {
     const canvas = document.createElement('canvas')
@@ -334,9 +232,7 @@ function App() {
     // Draw the processed image with proper positioning
     ctx.drawImage(img, x, y, img.width * scale, img.height * scale)
     
-    // Validate the generated photo
-    const validation = validatePassportPhoto(canvas)
-    setPhotoValidation(validation)
+
     
     return canvas.toDataURL('image/png', 1.0)
   }
@@ -369,14 +265,90 @@ function App() {
 
     setIsProcessing(true)
     setError(null)
-    setPhotoValidation(null)
 
     try {
-      // Use edited image if available, otherwise use original
-      const imageToProcess = editedImage || URL.createObjectURL(selectedImage)
+      // Apply edits inline if we're in the editor
+      let imageToProcess: string
       
+      if (showEditor) {
+        // Apply edits directly from the editor
+        if (!canvasRef.current) {
+          throw new Error('Canvas not available')
+        }
+        
+        const canvas = canvasRef.current
+        const ctx = canvas.getContext('2d')
+        if (!ctx) {
+          throw new Error('Failed to get canvas context')
+        }
+
+        const img = new Image()
+        img.onload = () => {
+          // Set canvas size
+          canvas.width = img.width
+          canvas.height = img.height
+
+          // Clear canvas
+          ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+          // Save context
+          ctx.save()
+
+          // Move to center for rotation
+          ctx.translate(canvas.width / 2, canvas.height / 2)
+          ctx.rotate((rotation * Math.PI) / 180)
+          ctx.translate(-canvas.width / 2, -canvas.height / 2)
+
+          // Draw rotated image
+          ctx.drawImage(img, 0, 0)
+
+          // Restore context
+          ctx.restore()
+
+          // Apply cropping
+          const cropX = (crop.x / 100) * canvas.width
+          const cropY = (crop.y / 100) * canvas.height
+          const cropWidth = (crop.width / 100) * canvas.width
+          const cropHeight = (crop.height / 100) * canvas.height
+
+          // Create new canvas for cropped image
+          const croppedCanvas = document.createElement('canvas')
+          const croppedCtx = croppedCanvas.getContext('2d')
+          if (!croppedCtx) return
+
+          croppedCanvas.width = cropWidth
+          croppedCanvas.height = cropHeight
+
+          // Draw cropped portion
+          croppedCtx.drawImage(
+            canvas,
+            cropX, cropY, cropWidth, cropHeight,
+            0, 0, cropWidth, cropHeight
+          )
+
+          // Convert to data URL and continue processing
+          const editedImageUrl = croppedCanvas.toDataURL('image/png')
+          continueProcessing(editedImageUrl)
+        }
+
+        img.src = URL.createObjectURL(selectedImage)
+        return // Exit early, processing will continue in the onload callback
+      } else {
+        // Use existing edited image or original
+        imageToProcess = editedImage || URL.createObjectURL(selectedImage)
+        continueProcessing(imageToProcess)
+      }
+      
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to process image')
+      setIsProcessing(false)
+    }
+  }
+
+  const continueProcessing = async (imageUrl: string) => {
+    try {
       // Remove background
-      const processedBlob = await removeBackground(imageToProcess)
+      const processedBlob = await removeBackground(imageUrl)
       
       // Load the processed image
       const img = new Image()
@@ -386,6 +358,7 @@ function App() {
           const dataUrl = createPassportPhoto(img)
           setProcessedImage(dataUrl)
           setIsProcessing(false)
+          setShowEditor(false) // Close editor after successful processing
         } catch (err) {
           setError(err instanceof Error ? err.message : 'Failed to create passport photo')
           setIsProcessing(false)
@@ -416,7 +389,6 @@ function App() {
     setEditedImage(null)
     setProcessedImage(null)
     setError(null)
-    setPhotoValidation(null)
     setShowEditor(false)
     setRotation(0)
     setCrop({ x: 0, y: 0, width: 100, height: 100 })
@@ -606,8 +578,19 @@ function App() {
             </div>
             
             <div className="editor-actions">
-              <button onClick={applyEdits} className="apply-btn">
-                Apply Edits & Continue
+              <button 
+                onClick={processImage} 
+                disabled={isProcessing}
+                className="create-passport-btn"
+              >
+                {isProcessing ? (
+                  <>
+                    <div className="button-spinner"></div>
+                    Creating Passport Photo...
+                  </>
+                ) : (
+                  'Create Passport Photo'
+                )}
               </button>
               <button onClick={resetEdits} className="reset-edits-btn">
                 Reset Edits
@@ -635,7 +618,14 @@ function App() {
                 disabled={isProcessing}
                 className="process-btn"
               >
-                {isProcessing ? 'Processing...' : 'Create Passport Photo'}
+                {isProcessing ? (
+                  <>
+                    <div className="button-spinner"></div>
+                    Creating Passport Photo...
+                  </>
+                ) : (
+                  'Create Passport Photo'
+                )}
               </button>
               <button 
                 onClick={() => setShowEditor(true)}
@@ -688,38 +678,9 @@ function App() {
               </div>
             </div>
             
-            <div className="compliance-info">
-              <h4>✅ Photo Compliance</h4>
-              <div className="compliance-grid">
-                <div className="compliance-item">✓ 2" × 2" dimensions</div>
-                <div className="compliance-item">✓ 300 DPI resolution</div>
-                <div className="compliance-item">✓ Pure white background</div>
-                <div className="compliance-item">✓ Maximum frame utilization</div>
-                <div className="compliance-item">✓ Minimal white space</div>
-                <div className="compliance-item">✓ USA & India standards</div>
-                <div className="compliance-item">✓ Ready for printing</div>
-              </div>
-            </div>
 
-            {photoValidation && (
-              <div className="validation-info">
-                <h4>🔍 Quality Validation</h4>
-                <div className="validation-grid">
-                  <div className={`validation-item ${photoValidation.dimensions ? 'valid' : 'invalid'}`}>
-                    {photoValidation.dimensions ? '✓' : '✗'} Dimensions: 600×600px
-                  </div>
-                  <div className={`validation-item ${photoValidation.background ? 'valid' : 'invalid'}`}>
-                    {photoValidation.background ? '✓' : '✗'} White Background
-                  </div>
-                  <div className={`validation-item ${photoValidation.positioning ? 'valid' : 'invalid'}`}>
-                    {photoValidation.positioning ? '✓' : '✗'} Maximum Frame Coverage
-                  </div>
-                  <div className={`validation-item ${photoValidation.quality ? 'valid' : 'invalid'}`}>
-                    {photoValidation.quality ? '✓' : '✗'} High Quality (300 DPI)
-                  </div>
-                </div>
-              </div>
-            )}
+
+
             
             <div className="action-buttons">
               <button onClick={downloadImage} className="download-btn">

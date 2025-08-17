@@ -60,7 +60,7 @@ A React web app that creates 2x2 passport photos meeting **USA and India passpor
 ### **Edit Workflow**
 1. **Upload Image**: Select or drag & drop your photo
 2. **Edit & Adjust**: Rotate and crop as needed
-3. **Apply Changes**: Process the edited image
+3. **Create Passport Photo**: Generate passport photo directly from editor
 4. **Background Removal**: AI removes background automatically
 5. **Final Result**: Perfect 2x2 passport photo
 
@@ -90,7 +90,7 @@ A React web app that creates 2x2 passport photos meeting **USA and India passpor
 
 1. **Upload Image**: Click or drag & drop any image
 2. **Edit Image**: Rotate and crop for optimal positioning
-3. **Process Photo**: Click "Apply Edits & Continue" to remove background
+3. **Create Passport Photo**: Click "Create Passport Photo" to process and generate your passport photo
 4. **Review Results**: Compare original vs. processed photos side by side
 5. **Download**: Save your compliant 2x2 passport photo
 6. **Create More**: Reset and create additional photos

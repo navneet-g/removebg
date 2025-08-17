@@ -378,7 +378,7 @@ function App() {
     
     const link = document.createElement('a')
     link.href = processedImage
-    link.download = 'passport-photo-2x2-usa-india.png'
+    link.download = 'passport-photo-2x2.png'
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -592,9 +592,11 @@ function App() {
                   'Create Passport Photo'
                 )}
               </button>
-              <button onClick={resetEdits} className="reset-edits-btn">
-                Reset Edits
-              </button>
+              {(rotation !== 0 || crop.x !== 0 || crop.y !== 0 || crop.width !== 100 || crop.height !== 100) && (
+                <button onClick={resetEdits} className="reset-edits-btn">
+                  Reset Edits
+                </button>
+              )}
               <button onClick={resetApp} className="reset-btn">
                 Select Different Image
               </button>
@@ -653,7 +655,6 @@ function App() {
 
         {processedImage && selectedImage && (
           <div className="result-section">
-            <h3>Before & After Comparison</h3>
             <div className="comparison-container">
               <div className="image-comparison">
                 <div className="comparison-item">
@@ -697,9 +698,7 @@ function App() {
         )}
       </main>
 
-      <footer className="app-footer">
-        <p>Powered by @imgly/background-removal</p>
-      </footer>
+
     </div>
   )
 }

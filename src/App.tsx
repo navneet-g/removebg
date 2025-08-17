@@ -488,40 +488,53 @@ function App() {
             
             <div className="editor-container">
               <div className="image-editor">
-                <canvas
-                  ref={canvasRef}
-                  className="editor-canvas"
-                  style={{ display: 'none' }}
-                />
-                <div className="image-preview-container">
-                  <img 
-                    src={URL.createObjectURL(selectedImage)} 
-                    alt="Edit" 
-                    className="editor-preview-image"
-                    style={{
-                      transform: `rotate(${rotation}deg)`,
-                      transformOrigin: 'center'
-                    }}
-                  />
-                  <div 
-                    className="crop-overlay"
-                    style={{
-                      left: `${crop.x}%`,
-                      top: `${crop.y}%`,
-                      width: `${crop.width}%`,
-                      height: `${crop.height}%`
-                    }}
+                <div className="editor-preview-container">
+                  <button 
+                    className="rotate-btn rotate-left"
+                    onClick={() => setRotation(prev => prev - 1)}
+                    title="Rotate Left 1°"
                   >
-                    <div className="crop-handle crop-handle-top-left" onMouseDown={(e) => handleMouseDown(e, 'top-left')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
-                    <div className="crop-handle crop-handle-top-right" onMouseDown={(e) => handleMouseDown(e, 'top-right')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
-                    <div className="crop-handle crop-handle-bottom-left" onMouseDown={(e) => handleMouseDown(e, 'bottom-left')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
-                    <div className="crop-handle crop-handle-bottom-right" onMouseDown={(e) => handleMouseDown(e, 'bottom-right')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
-                    <div className="crop-handle crop-handle-top" onMouseDown={(e) => handleMouseDown(e, 'top')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
-                    <div className="crop-handle crop-handle-bottom" onMouseDown={(e) => handleMouseDown(e, 'bottom')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
-                    <div className="crop-handle crop-handle-left" onMouseDown={(e) => handleMouseDown(e, 'left')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
-                    <div className="crop-handle crop-handle-right" onMouseDown={(e) => handleMouseDown(e, 'right')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
-                    <div className="crop-handle crop-handle-move" onMouseDown={(e) => handleMouseDown(e, 'move')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
+                    ↶
+                  </button>
+                  
+                  <div className="image-preview-container">
+                    <img 
+                      src={URL.createObjectURL(selectedImage)} 
+                      alt="Edit" 
+                      className="editor-preview-image"
+                      style={{
+                        transform: `rotate(${rotation}deg)`,
+                        transformOrigin: 'center'
+                      }}
+                    />
+                    <div 
+                      className="crop-overlay"
+                      style={{
+                        left: `${crop.x}%`,
+                        top: `${crop.y}%`,
+                        width: `${crop.width}%`,
+                        height: `${crop.height}%`
+                      }}
+                    >
+                      <div className="crop-handle crop-handle-top-left" onMouseDown={(e) => handleMouseDown(e, 'top-left')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
+                      <div className="crop-handle crop-handle-top-right" onMouseDown={(e) => handleMouseDown(e, 'top-right')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
+                      <div className="crop-handle crop-handle-bottom-left" onMouseDown={(e) => handleMouseDown(e, 'bottom-left')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
+                      <div className="crop-handle crop-handle-bottom-right" onMouseDown={(e) => handleMouseDown(e, 'bottom-right')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
+                      <div className="crop-handle crop-handle-top" onMouseDown={(e) => handleMouseDown(e, 'top')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
+                      <div className="crop-handle crop-handle-bottom" onMouseDown={(e) => handleMouseDown(e, 'bottom')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
+                      <div className="crop-handle crop-handle-left" onMouseDown={(e) => handleMouseDown(e, 'left')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
+                      <div className="crop-handle crop-handle-right" onMouseDown={(e) => handleMouseDown(e, 'right')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
+                      <div className="crop-handle crop-handle-move" onMouseDown={(e) => handleMouseDown(e, 'move')} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}></div>
+                    </div>
                   </div>
+                  
+                  <button 
+                    className="rotate-btn rotate-right"
+                    onClick={() => setRotation(prev => prev + 1)}
+                    title="Rotate Right 1°"
+                  >
+                    ↷
+                  </button>
                 </div>
               </div>
               

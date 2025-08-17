@@ -520,15 +520,6 @@ body {
   min-width: 0;
 }
 
-.image-preview-container {
-  position: relative;
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-}
-
 .editor-preview-container {
   position: relative;
   display: flex;
@@ -537,6 +528,15 @@ body {
   width: 100%;
   height: 100%;
   padding: 0 20px;
+}
+
+.image-preview-container {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 }
 
 .rotate-btn {
@@ -717,9 +717,110 @@ body {
   letter-spacing: 0.3px;
 }
 
+.rotation-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
 
+.rotation-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
 
+.rotation-controls {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+  justify-content: center;
+}
 
+.fine-rotation-controls {
+  margin-bottom: 1rem;
+  padding: 0.8rem;
+  background: rgba(76, 175, 80, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+.fine-rotation-controls h5 {
+  color: #4CAF50;
+  margin-bottom: 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.fine-rotation-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.fine-rotation-btn {
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  color: white;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.75rem;
+}
+
+.fine-rotation-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+}
+
+.rotation-input {
+  margin-bottom: 1rem;
+}
+
+.rotation-input label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  color: #333;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.rotation-input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  justify-content: center;
+}
+
+.rotation-number-input {
+  width: 80px;
+  padding: 0.4rem;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.rotation-number-input:focus {
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+.degree-symbol {
+  color: #4CAF50;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.rotation-display {
+  color: #667eea;
+  font-weight: 600;
+  font-size: 0.8rem;
+  background: rgba(102, 126, 234, 0.1);
+  padding: 0.4rem;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
 
 .reset-rotation-btn {
   background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
@@ -733,8 +834,6 @@ body {
   transform: translateY(-1px);
   box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
 }
-
-
 
 .editor-actions {
   display: flex;

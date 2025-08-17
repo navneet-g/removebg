@@ -43,6 +43,8 @@ function App() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isDragOver, setIsDragOver] = useState(false)
+  const [printablePage, setPrintablePage] = useState<string | null>(null)
+  const [isGeneratingPrintable, setIsGeneratingPrintable] = useState(false)
 
   const [showEditor, setShowEditor] = useState(false)
   const [rotation, setRotation] = useState(0)
@@ -261,6 +263,90 @@ function App() {
     return canvas.toDataURL('image/png', 1.0)
   }
 
+  const generatePrintablePage = async (passportPhotoUrl: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      
+      if (!ctx) {
+        reject(new Error('Failed to get canvas context'))
+        return
+      }
+
+      // 4x6 inch page at 300 DPI = 1200x1800 pixels
+      const pageWidth = 4 * 300  // 1200 pixels
+      const pageHeight = 6 * 300 // 1800 pixels
+      
+      canvas.width = pageWidth
+      canvas.height = pageHeight
+      
+      // Fill with pure white background
+      ctx.fillStyle = '#FFFFFF'
+      ctx.fillRect(0, 0, pageWidth, pageHeight)
+      
+      // Load the passport photo
+      const img = new Image()
+      img.onload = () => {
+        try {
+          // Calculate photo dimensions for the grid
+          // We want 2 columns and 3 rows = 6 photos total
+          const photoSize = 2 * 300 // 2 inches * 300 DPI = 600 pixels
+          
+          // Calculate grid layout - no spacing between photos
+          // Total width: 2 photos side by side
+          // Total height: 3 photos stacked
+          const gridWidth = 2 * photoSize
+          const gridHeight = 3 * photoSize
+          
+          // Center the grid on the page
+          const gridStartX = (pageWidth - gridWidth) / 2
+          const gridStartY = (pageHeight - gridHeight) / 2
+          
+          // Draw 6 photos in a 2x3 grid
+          for (let row = 0; row < 3; row++) {
+            for (let col = 0; col < 2; col++) {
+              const x = gridStartX + (col * photoSize)
+              const y = gridStartY + (row * photoSize)
+              
+              ctx.drawImage(img, x, y, photoSize, photoSize)
+            }
+          }
+          
+          // Draw cut lines between photos
+          ctx.strokeStyle = '#000000'
+          ctx.lineWidth = 2
+          ctx.setLineDash([5, 5]) // Dashed line for better visibility
+          
+          // Vertical cut line between columns (exactly between the two columns)
+          const verticalCutX = gridStartX + photoSize
+          ctx.beginPath()
+          ctx.moveTo(verticalCutX, gridStartY)
+          ctx.lineTo(verticalCutX, gridStartY + gridHeight)
+          ctx.stroke()
+          
+          // Horizontal cut lines between rows (exactly between each row)
+          for (let row = 1; row < 3; row++) {
+            const horizontalCutY = gridStartY + (row * photoSize)
+            ctx.beginPath()
+            ctx.moveTo(gridStartX, horizontalCutY)
+            ctx.lineTo(gridStartX + gridWidth, horizontalCutY)
+            ctx.stroke()
+          }
+          
+          resolve(canvas.toDataURL('image/png', 1.0))
+        } catch (error) {
+          reject(error)
+        }
+      }
+      
+      img.onerror = () => {
+        reject(new Error('Failed to load passport photo'))
+      }
+      
+      img.src = passportPhotoUrl
+    })
+  }
+
   const calculateOptimalPosition = (img: HTMLImageElement, canvasSize: number) => {
     // For passport photos, we want to eliminate ALL white space
     // Make the subject fill the entire frame with minimal margins
@@ -408,6 +494,33 @@ function App() {
     document.body.removeChild(link)
   }
 
+  const handleGeneratePrintable = async () => {
+    if (!processedImage) return
+    
+    setIsGeneratingPrintable(true)
+    setError(null)
+    
+    try {
+      const printablePageUrl = await generatePrintablePage(processedImage)
+      setPrintablePage(printablePageUrl)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to generate printable page')
+    } finally {
+      setIsGeneratingPrintable(false)
+    }
+  }
+
+  const downloadPrintablePage = () => {
+    if (!printablePage) return
+    
+    const link = document.createElement('a')
+    link.href = printablePage
+    link.download = 'passport-photos-4x6-printable.png'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
   const resetApp = () => {
     setSelectedImage(null)
     setEditedImage(null)
@@ -416,6 +529,7 @@ function App() {
     setShowEditor(false)
     setRotation(0)
     setCrop({ x: 0, y: 0, width: 100, height: 100 })
+    setPrintablePage(null)
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
@@ -723,11 +837,50 @@ function App() {
               <button onClick={downloadImage} className="download-btn">
                 Download Passport Photo
               </button>
+              <button 
+                onClick={handleGeneratePrintable} 
+                disabled={isGeneratingPrintable}
+                className="printable-btn"
+              >
+                {isGeneratingPrintable ? (
+                  <>
+                    <div className="button-spinner"></div>
+                    Generating Printable Page...
+                  </>
+                ) : (
+                  'Generate 4x6 Printable Page'
+                )}
+              </button>
               <button onClick={processImage} className="regenerate-btn">
                 Regenerate Photo
               </button>
               <button onClick={resetApp} className="reset-btn">
                 Create Another Photo
+              </button>
+            </div>
+          </div>
+        )}
+
+        {printablePage && (
+          <div className="printable-section">
+            <h3>4x6 Printable Page</h3>
+            <p className="printable-description">
+              This page contains 6 passport photos arranged in a 2x3 grid, perfect for printing on 4x6 inch photo paper. 
+              <strong>Thin black dashed lines</strong> are included to guide cutting between photos.
+            </p>
+            <div className="printable-preview">
+              <img 
+                src={printablePage} 
+                alt="Printable 4x6 Page" 
+                className="printable-page-image"
+              />
+            </div>
+            <div className="printable-actions">
+              <button onClick={downloadPrintablePage} className="download-printable-btn">
+                Download Printable Page
+              </button>
+              <button onClick={() => setPrintablePage(null)} className="close-printable-btn">
+                Close
               </button>
             </div>
           </div>

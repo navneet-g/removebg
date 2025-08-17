@@ -925,3 +925,162 @@ input:checked + .toggle-slider:before {
     padding: 0.75rem;
   }
 }
+
+/* Printable Page Styles */
+.printable-section {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 20px;
+  padding: 30px;
+  margin: 20px 0;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.printable-section h3 {
+  color: #64ffda;
+  margin: 0 0 15px 0;
+  font-size: 24px;
+  text-align: center;
+}
+
+.printable-description {
+  color: #b8c5d6;
+  text-align: center;
+  margin: 0 0 25px 0;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.printable-preview {
+  display: flex;
+  justify-content: center;
+  margin: 25px 0;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.printable-page-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.printable-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.download-printable-btn {
+  background: linear-gradient(135deg, #00d4aa 0%, #00b894 100%);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(0, 212, 170, 0.3);
+  border: 2px solid transparent;
+}
+
+.download-printable-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(0, 212, 170, 0.4);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.download-printable-btn:active {
+  transform: translateY(0);
+}
+
+.close-printable-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+  border: 2px solid transparent;
+}
+
+.close-printable-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.close-printable-btn:active {
+  transform: translateY(0);
+}
+
+.printable-btn {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+  border: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.printable-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(255, 107, 107, 0.4);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.printable-btn:active {
+  transform: translateY(0);
+}
+
+.printable-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 8px 25px rgba(255, 107, 107, 0.2);
+}
+
+/* Responsive adjustments for printable section */
+@media (max-width: 768px) {
+  .printable-section {
+    padding: 20px;
+    margin: 15px 0;
+  }
+  
+  .printable-section h3 {
+    font-size: 20px;
+  }
+  
+  .printable-description {
+    font-size: 14px;
+  }
+  
+  .printable-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .download-printable-btn,
+  .close-printable-btn {
+    width: 100%;
+    max-width: 300px;
+  }
+}

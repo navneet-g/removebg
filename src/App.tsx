@@ -55,6 +55,114 @@ function App() {
   const [dragHandle, setDragHandle] = useState<string | null>(null)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const [showCropAndRotate, setShowCropAndRotate] = useState(false)
+  const [keepBackground, setKeepBackground] = useState(false)
+  const [backgroundColor, setBackgroundColor] = useState('#F5F5F5')
+  const [currentView, setCurrentView] = useState<'upload' | 'editor' | 'result'>('upload')
+  const [photoHistory, setPhotoHistory] = useState<Array<{
+    id: string
+    name: string
+    timestamp: number
+    originalImage: string
+    imageData: string
+    processedImage: string
+    settings: {
+      rotation: number
+      crop: { x: number; y: number; width: number; height: number }
+      keepBackground: boolean
+      backgroundColor: string
+    }
+  }>>([])
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const [itemsPerView, setItemsPerView] = useState(4)
+
+  // Handle browser navigation and URL management
+  useEffect(() => {
+    const handlePopState = () => {
+      const urlParams = new URLSearchParams(window.location.search)
+      const view = urlParams.get('view') as 'upload' | 'editor' | 'result' | null
+      
+      if (view && view !== currentView) {
+        setCurrentView(view)
+        // Restore the appropriate state based on the view
+        if (view === 'upload') {
+          resetApp()
+        } else if (view === 'editor' && selectedImage) {
+          setShowEditor(true)
+        } else if (view === 'result' && processedImage) {
+          setShowEditor(false)
+        }
+      }
+    }
+
+    // Listen for browser back/forward button clicks
+    window.addEventListener('popstate', handlePopState)
+    
+    // Set initial view based on URL
+    const urlParams = new URLSearchParams(window.location.search)
+    const initialView = urlParams.get('view') as 'upload' | 'editor' | 'result' | null
+    if (initialView) {
+      setCurrentView(initialView)
+    }
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState)
+    }
+  }, [currentView, selectedImage, processedImage])
+
+  // Load photo history from local storage on component mount
+  useEffect(() => {
+    try {
+      const savedHistory = localStorage.getItem('photoHistory')
+      if (savedHistory) {
+        const parsedHistory = JSON.parse(savedHistory)
+        setPhotoHistory(parsedHistory)
+      }
+    } catch (error) {
+      console.warn('Failed to load photo history from local storage:', error)
+    }
+  }, [])
+
+  // Helper function to update URL and browser history
+  const updateView = (view: 'upload' | 'editor' | 'result') => {
+    setCurrentView(view)
+    const url = new URL(window.location.href)
+    url.searchParams.set('view', view)
+    window.history.pushState({ view }, '', url.toString())
+  }
+
+  // Helper function to save photo to history
+  const saveToHistory = async (imageData: string, processedImage: string) => {
+    if (!selectedImage) return
+
+    // Convert original file to data URL for storage
+    const originalImageData = await fileToDataURL(selectedImage)
+
+    const newPhoto = {
+      id: Date.now().toString(),
+      name: selectedImage.name,
+      timestamp: Date.now(),
+      originalImage: originalImageData,
+      imageData,
+      processedImage,
+      settings: {
+        rotation,
+        crop,
+        keepBackground,
+        backgroundColor
+      }
+    }
+
+    setPhotoHistory(prev => {
+      const updatedHistory = [newPhoto, ...prev.slice(0, 9)] // Keep only last 10
+      // Save to local storage
+      try {
+        localStorage.setItem('photoHistory', JSON.stringify(updatedHistory))
+      } catch (error) {
+        console.warn('Failed to save photo history to local storage:', error)
+      }
+      return updatedHistory
+    })
+  }
 
   // Add global mouse and touch event listeners to handle interactions outside the image
   useEffect(() => {
@@ -175,6 +283,7 @@ function App() {
       setShowEditor(true)
       setRotation(0)
       setCrop({ x: 0, y: 0, width: 100, height: 100 })
+      updateView('editor')
     }
   }
 
@@ -203,6 +312,7 @@ function App() {
         setShowEditor(true)
         setRotation(0)
         setCrop({ x: 0, y: 0, width: 100, height: 100 })
+        updateView('editor')
       }
     }
   }
@@ -231,6 +341,8 @@ function App() {
   const resetEdits = () => {
     setRotation(0)
     setCrop({ x: 0, y: 0, width: 100, height: 100 })
+    setKeepBackground(false)
+    setBackgroundColor('#F5F5F5')
   }
 
 
@@ -248,17 +360,20 @@ function App() {
     canvas.width = size
     canvas.height = size
     
-    // Fill with pure white background (RGB: 255, 255, 255)
-    ctx.fillStyle = '#FFFFFF'
-    ctx.fillRect(0, 0, size, size)
+    if (keepBackground) {
+      // Change background - fill with selected background color
+      ctx.fillStyle = backgroundColor
+      ctx.fillRect(0, 0, size, size)
+    } else {
+      // Keep original background - use transparent background
+      ctx.clearRect(0, 0, size, size)
+    }
     
     // Calculate optimal scaling and positioning for passport photo requirements
     const { scale, x, y } = calculateOptimalPosition(img, size)
     
     // Draw the processed image with proper positioning
     ctx.drawImage(img, x, y, img.width * scale, img.height * scale)
-    
-
     
     return canvas.toDataURL('image/png', 1.0)
   }
@@ -457,8 +572,10 @@ function App() {
 
   const continueProcessing = async (imageUrl: string) => {
     try {
-      // Remove background
-      const processedBlob = await removeBackground(imageUrl)
+      let processedBlob: Blob
+      
+      // Always remove background first, then apply custom color if needed
+      processedBlob = await removeBackground(imageUrl)
       
       // Load the processed image
       const img = new Image()
@@ -469,6 +586,10 @@ function App() {
           setProcessedImage(dataUrl)
           setIsProcessing(false)
           setShowEditor(false) // Close editor after successful processing
+          // Save to history (fire and forget)
+          saveToHistory(imageUrl, dataUrl).catch(err => 
+            console.warn('Failed to save to history:', err)
+          )
         } catch (err) {
           setError(err instanceof Error ? err.message : 'Failed to create passport photo')
           setIsProcessing(false)
@@ -530,6 +651,8 @@ function App() {
     setRotation(0)
     setCrop({ x: 0, y: 0, width: 100, height: 100 })
     setPrintablePage(null)
+    setKeepBackground(false)
+    setBackgroundColor('#F5F5F5')
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
@@ -557,6 +680,122 @@ function App() {
     setIsDragging(false)
     setDragHandle(null)
   }
+
+  // Helper function to load photo from history
+  const loadFromHistory = (photo: typeof photoHistory[0]) => {
+    // Create a file from the original image data
+    const originalBlob = dataURLtoBlob(photo.originalImage)
+    setSelectedImage(new File([originalBlob], photo.name, { type: 'image/png' }))
+    
+    // Set the edited image (with crop/rotation applied)
+    setEditedImage(photo.imageData)
+    
+    // Set the final processed image
+    setProcessedImage(photo.processedImage)
+    
+    // Restore all the settings
+    setRotation(photo.settings.rotation)
+    setCrop(photo.settings.crop)
+    setKeepBackground(photo.settings.keepBackground)
+    setBackgroundColor(photo.settings.backgroundColor)
+    
+    setShowEditor(false)
+    setError(null)
+    updateView('result')
+  }
+
+  // Helper function to convert data URL to Blob
+  const dataURLtoBlob = (dataURL: string): Blob => {
+    const arr = dataURL.split(',')
+    const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/png'
+    const bstr = atob(arr[1])
+    let n = bstr.length
+    const u8arr = new Uint8Array(n)
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n)
+    }
+    return new Blob([u8arr], { type: mime })
+  }
+
+  // Helper function to convert File to Data URL
+  const fileToDataURL = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        resolve(reader.result as string)
+      }
+      reader.onerror = () => {
+        reject(new Error('Failed to read file'))
+      }
+      reader.readAsDataURL(file)
+    })
+  }
+
+  // Helper function to remove photo from history
+  const removeFromHistory = (photoId: string) => {
+    setPhotoHistory(prev => {
+      const updatedHistory = prev.filter(photo => photo.id !== photoId)
+      // Update local storage
+      try {
+        localStorage.setItem('photoHistory', JSON.stringify(updatedHistory))
+      } catch (error) {
+        console.warn('Failed to update photo history in local storage:', error)
+      }
+      return updatedHistory
+    })
+  }
+
+  // Helper function to clear all photo history
+  const clearPhotoHistory = () => {
+    setPhotoHistory([])
+    try {
+      localStorage.removeItem('photoHistory')
+    } catch (error) {
+      console.warn('Failed to clear photo history from local storage:', error)
+    }
+  }
+
+  // Carousel navigation functions
+  const nextSlide = () => {
+    setCurrentSlide(prev => {
+      const maxSlide = Math.max(0, photoHistory.length - itemsPerView)
+      return prev >= maxSlide ? 0 : prev + 1
+    })
+  }
+
+  const prevSlide = () => {
+    setCurrentSlide(prev => {
+      const maxSlide = Math.max(0, photoHistory.length - itemsPerView)
+      return prev <= 0 ? maxSlide : prev - 1
+    })
+  }
+
+  const goToSlide = (index: number) => {
+    setCurrentSlide(index)
+  }
+
+  // Calculate visible items for carousel
+  const visibleItems = photoHistory.slice(currentSlide, currentSlide + itemsPerView)
+
+  // Handle responsive carousel sizing
+  useEffect(() => {
+    const updateItemsPerView = () => {
+      if (window.innerWidth < 640) {
+        setItemsPerView(2) // Mobile: 2 items per view
+      } else if (window.innerWidth < 1024) {
+        setItemsPerView(3) // Tablet: 3 items per view
+      } else {
+        setItemsPerView(4) // Desktop: 4 items per view
+      }
+    }
+
+    updateItemsPerView()
+    window.addEventListener('resize', updateItemsPerView)
+    
+    return () => {
+      window.removeEventListener('resize', updateItemsPerView)
+    }
+  }, [])
 
   return (
     <div className="app">
@@ -588,7 +827,99 @@ function App() {
               style={{ display: 'none' }}
             />
             
-
+            {/* Photo History Section */}
+            {photoHistory.length > 0 && (
+              <div className="photo-history-section">
+                <div className="history-header">
+                  <h3>Recent Photos</h3>
+                  <button 
+                    onClick={clearPhotoHistory}
+                    className="clear-history-btn"
+                    title="Clear all history"
+                  >
+                    Clear All
+                  </button>
+                </div>
+                
+                {photoHistory.length > itemsPerView && (
+                  <div className="carousel-controls">
+                    <button 
+                      onClick={prevSlide}
+                      className="carousel-btn carousel-prev"
+                      title="Previous photos"
+                    >
+                      ‹
+                    </button>
+                    <div className="carousel-dots">
+                      {Array.from({ length: Math.ceil(photoHistory.length / itemsPerView) }).map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => goToSlide(index * itemsPerView)}
+                          className={`carousel-dot ${currentSlide === index * itemsPerView ? 'active' : ''}`}
+                          title={`Go to page ${index + 1}`}
+                        />
+                      ))}
+                    </div>
+                    <button 
+                      onClick={nextSlide}
+                      className="carousel-btn carousel-next"
+                      title="Next photos"
+                    >
+                      ›
+                    </button>
+                  </div>
+                )}
+                
+                <div className="history-grid">
+                  {visibleItems.map((photo) => (
+                    <div key={photo.id} className="history-item">
+                      <div className="history-preview">
+                        <div className="history-images">
+                          <div className="history-original">
+                            <span className="image-label">Original</span>
+                            <img 
+                              src={photo.originalImage} 
+                              alt={`Original ${photo.name}`}
+                              className="history-thumbnail"
+                            />
+                          </div>
+                          <div className="history-processed">
+                            <span className="image-label">Processed</span>
+                            <img 
+                              src={photo.processedImage} 
+                              alt={`Processed ${photo.name}`}
+                              className="history-thumbnail"
+                            />
+                          </div>
+                        </div>
+                        <div className="history-overlay">
+                          <button
+                            onClick={() => loadFromHistory(photo)}
+                            className="load-history-btn"
+                            title="Load this photo"
+                          >
+                            Load
+                          </button>
+                          <button
+                            onClick={() => removeFromHistory(photo.id)}
+                            className="remove-history-btn"
+                            title="Remove from history"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      </div>
+                      <div className="history-info">
+                        <span className="history-name">{photo.name}</span>
+                        <span className="history-date">
+                          {new Date(photo.timestamp).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -605,6 +936,38 @@ function App() {
                   <span className="toggle-slider"></span>
                 </label>
                 <span className="toggle-label">Crop and Rotate</span>
+              </div>
+              
+              <div className="advanced-mode-toggle">
+                <label className="toggle-switch">
+                  <input
+                    type="checkbox"
+                    checked={keepBackground}
+                    onChange={(e) => setKeepBackground(e.target.checked)}
+                  />
+                  <span className="toggle-slider"></span>
+                </label>
+                <span className="toggle-label">Change Background Color</span>
+                
+                {keepBackground && (
+                  <>
+                    <label className="color-picker-label">Color:</label>
+                    <input
+                      type="color"
+                      value={backgroundColor}
+                      onChange={(e) => setBackgroundColor(e.target.value)}
+                      className="color-picker"
+                      title="Choose background color"
+                    />
+                    <button
+                      onClick={() => setBackgroundColor('#F5F5F5')}
+                      className="reset-color-btn"
+                      title="Reset to off-white"
+                    >
+                      Reset
+                    </button>
+                  </>
+                )}
               </div>
             </div>
             
@@ -742,7 +1105,7 @@ function App() {
                   'Create Passport Photo'
                 )}
               </button>
-              {(rotation !== 0 || crop.x !== 0 || crop.y !== 0 || crop.width !== 100 || crop.height !== 100) && (
+              {(rotation !== 0 || crop.x !== 0 || crop.y !== 0 || crop.width !== 100 || crop.height !== 100 || keepBackground || backgroundColor !== '#F5F5F5') && (
                 <button onClick={resetEdits} className="reset-edits-btn">
                   Reset Edits
                 </button>

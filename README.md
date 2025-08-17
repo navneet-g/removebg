@@ -1,6 +1,6 @@
 # Passport Photo Creator
 
-[![Deploy to GitHub Pages](https://github.com/yourusername/remvoebg/workflows/Deploy%20to%20GitHub%20Pages/badge.svg)](https://github.com/yourusername/remvoebg/actions)
+[![Deploy to GitHub Pages](https://github.com/navneet-g/remvoebg/workflows/Deploy%20to%20GitHub%20Pages/badge.svg)](https://github.com/navneet-g/remvoebg/actions)
 
 A React web app that creates 2x2 passport photos meeting **USA and India passport specifications** by removing backgrounds and replacing them with pure white backgrounds.
 

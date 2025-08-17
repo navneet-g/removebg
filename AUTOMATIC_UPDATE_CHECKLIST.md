@@ -125,7 +125,7 @@ git push origin main
 
 ### **Your App URL**
 Once working, your app will be automatically updated at:
-**`https://yourusername.github.io/remvoebg/`**
+**`https://navneet-g.github.io/remvoebg/`**
 
 ---
 

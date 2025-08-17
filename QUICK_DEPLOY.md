@@ -41,7 +41,7 @@ git push origin main
 ## 🎉 **Success!**
 
 Once deployed, share your app URL:
-**`https://yourusername.github.io/remvoebg/`**
+**`https://navneet-g.github.io/remvoebg/`**
 
 ---
 
